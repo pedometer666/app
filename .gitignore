@@ -25,3 +25,7 @@ Thumbs.db
 *.jks
 *.keystore
 keystore.properties
+
+# Companion test deps / artifacts
+companion/node_modules/
+companion/package-lock.json

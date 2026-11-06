@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="dark" />
+  <meta name="theme-color" content="#0C1210" />
+  <title>Pedometer Companion</title>
+  <meta name="description" content="Compare your Pedometer stats daily, monthly and yearly on any computer. Works offline on ChromeOS, Windows, macOS and Linux." />
+  <link rel="icon" type="image/svg+xml" href="icon.svg" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- ──────────────────────────  Header  ────────────────────────── -->
+  <header class="app-header">
+    <div class="brand">
+      <img src="icon.svg" alt="Pedometer logo" class="brand-mark" />
+      <div>
+        <h1 class="brand-title">Pedometer <span>Companion</span></h1>
+        <p class="brand-sub">Daily · Monthly · Yearly — stats on any screen</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <div class="unit-toggle" role="group" aria-label="Distance units">
+        <button id="unit-metric" class="unit-btn is-active" type="button">km</button>
+        <button id="unit-imperial" class="unit-btn" type="button">mi</button>
+      </div>
+      <button id="btn-import" class="btn btn-primary" type="button">Import export</button>
+      <button id="btn-sample" class="btn btn-ghost" type="button">Load sample</button>
+      <input id="file-input" type="file" accept="application/json,.json" hidden />
+    </div>
+  </header>
+
+  <!-- ──────────────────────────  Data status bar  ────────────────────────── -->
+  <div id="data-status" class="data-status" hidden>
+    <span class="status-dot"></span>
+    <span id="data-status-text"></span>
+    <button id="btn-clear" class="link-btn" type="button">Clear stored data</button>
+  </div>
+
+  <!-- ──────────────────────────  Empty state  ────────────────────────── -->
+  <main>
+    <section id="empty-state" class="empty-state">
+      <div id="drop-zone" class="drop-zone">
+        <svg viewBox="0 0 64 64" class="drop-icon" aria-hidden="true">
+          <rect x="10" y="6" width="44" height="52" rx="6" fill="none" stroke="#34D399" stroke-width="3"/>
+          <path d="M24 34h16M24 42h10" stroke="#34D399" stroke-width="3" stroke-linecap="round"/>
+          <path d="M32 14v12m0 0l-5-5m5 5l5-5" stroke="#34D399" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        </svg>
+        <h2>Bring your steps to the big screen</h2>
+        <p>In the Pedometer Android app tap <strong>⋮ Export &amp; Share Data</strong>, pick a destination, then drop the <code>pedometer-export-*.json</code> file here — or click below.</p>
+        <button id="btn-import-empty" class="btn btn-primary btn-large" type="button">Choose export file…</button>
+        <button id="btn-sample-empty" class="btn btn-ghost" type="button">Just exploring? Load the sample dataset</button>
+        <p class="drop-hint">Your data never leaves this computer. Everything is stored locally in this browser.</p>
+      </div>
+    </section>
+
+    <!-- ──────────────────────────  Dashboard (populated state)  ────────────────────────── -->
+    <section id="dashboard" hidden>
+      <!-- KPI strip -->
+      <div class="kpi-grid" id="kpi-grid">
+        <div class="kpi-card accent">
+          <span class="kpi-label">Total steps</span>
+          <span class="kpi-value" id="kpi-steps">–</span>
+          <span class="kpi-foot" id="kpi-active-days">–</span>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-label">Total distance</span>
+          <span class="kpi-value" id="kpi-distance">–</span>
+          <span class="kpi-foot">across all recorded days</span>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-label">Active calories</span>
+          <span class="kpi-value" id="kpi-calories">–</span>
+          <span class="kpi-foot">lifetime burn</span>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-label">Best day</span>
+          <span class="kpi-value" id="kpi-best">–</span>
+          <span class="kpi-foot" id="kpi-best-date">–</span>
+        </div>
+      </div>
+
+      <!-- Tab navigation -->
+      <nav class="tabs" role="tablist">
+        <button class="tab is-active" data-tab="daily" role="tab">Daily</button>
+        <button class="tab" data-tab="monthly" role="tab">Monthly</button>
+        <button class="tab" data-tab="yearly" role="tab">Yearly</button>
+        <button class="tab" data-tab="compare" role="tab">Compare</button>
+      </nav>
+
+      <!-- ───────────  DAILY TAB  ─────────── -->
+      <div id="tab-daily" class="tab-panel" role="tabpanel">
+        <div class="panel-head">
+          <div>
+            <h2>Daily breakdown</h2>
+            <p class="panel-sub">Steps, distance and calories per day</p>
+          </div>
+          <div class="panel-controls">
+            <label class="field">Month
+              <input type="month" id="daily-month" />
+            </label>
+            <button id="btn-daily-csv" class="btn btn-ghost" type="button">Download CSV</button>
+          </div>
+        </div>
+        <div class="stat-strip" id="daily-strip"></div>
+        <div class="chart-card">
+          <div id="daily-chart" class="chart"></div>
+          <p class="chart-note" id="daily-goal-note"></p>
+        </div>
+        <div class="table-card">
+          <table class="data-table" id="daily-table">
+            <thead>
+              <tr><th>Date</th><th class="num">Steps</th><th class="num">% of goal</th><th class="num">Distance</th><th class="num">Calories</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ───────────  MONTHLY TAB  ─────────── -->
+      <div id="tab-monthly" class="tab-panel" role="tabpanel" hidden>
+        <div class="panel-head">
+          <div>
+            <h2>Monthly totals</h2>
+            <p class="panel-sub">Twelve-month view with year-over-year deltas</p>
+          </div>
+          <div class="panel-controls">
+            <label class="field">Year
+              <select id="monthly-year"></select>
+            </label>
+            <button id="btn-monthly-csv" class="btn btn-ghost" type="button">Download CSV</button>
+          </div>
+        </div>
+        <div class="stat-strip" id="monthly-strip"></div>
+        <div class="chart-card"><div id="monthly-chart" class="chart"></div></div>
+        <div class="table-card">
+          <table class="data-table" id="monthly-table">
+            <thead>
+              <tr><th>Month</th><th class="num">Steps</th><th class="num">vs. last year</th><th class="num">Distance</th><th class="num">Calories</th><th class="num">Best day</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ───────────  YEARLY TAB  ─────────── -->
+      <div id="tab-yearly" class="tab-panel" role="tabpanel" hidden>
+        <div class="panel-head">
+          <div>
+            <h2>Yearly totals</h2>
+            <p class="panel-sub">Long-term trend across every recorded year</p>
+          </div>
+        </div>
+        <div class="chart-card"><div id="yearly-chart" class="chart"></div></div>
+        <div class="table-card">
+          <table class="data-table" id="yearly-table">
+            <thead>
+              <tr><th>Year</th><th class="num">Steps</th><th class="num">Avg / day</th><th class="num">Distance</th><th class="num">Calories</th><th class="num">Active days</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ───────────  COMPARE TAB  ─────────── -->
+      <div id="tab-compare" class="tab-panel" role="tabpanel" hidden>
+        <div class="panel-head">
+          <div>
+            <h2>Compare periods</h2>
+            <p class="panel-sub">Pick any two days, months or years and see the delta</p>
+          </div>
+          <div class="panel-controls">
+            <label class="field">Granularity
+              <select id="compare-granularity">
+                <option value="day">Day</option>
+                <option value="month" selected>Month</option>
+                <option value="year">Year</option>
+              </select>
+            </label>
+          </div>
+        </div>
+        <div class="compare-controls">
+          <label class="field big">Period A
+            <select id="compare-a"></select>
+          </label>
+          <button id="compare-swap" class="btn btn-ghost swap-btn" type="button" aria-label="Swap periods">⇄</button>
+          <label class="field big">Period B
+            <select id="compare-b"></select>
+          </label>
+        </div>
+        <div id="compare-verdict" class="compare-verdict"></div>
+        <div class="compare-grid" id="compare-grid"></div>
+      </div>
+    </section>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <footer class="app-footer">
+    <span>Pedometer Companion · runs fully offline · your data stays on this device</span>
+    <button id="btn-print" class="link-btn" type="button">Print / save as PDF</button>
+  </footer>
+
+  <script src="sample-data.js"></script>
+  <script src="app.js"></script>
+  <script>
+    if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol) && location.hostname !== '') {
+      navigator.serviceWorker.register('sw.js').catch(() => { /* offline install is optional */ });
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+{
+  "name": "Pedometer Companion",
+  "short_name": "Pedometer",
+  "description": "Compare Pedometer stats daily, monthly and yearly on any computer. Works fully offline.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0C1210",
+  "theme_color": "#0C1210",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
