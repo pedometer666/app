@@ -1,5 +1,6 @@
 package com.pedometer.app.data.local
 
+import com.pedometer.app.domain.SensorFoldLogic
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Transaction
@@ -78,27 +79,38 @@ interface StepDao {
     suspend fun recomputeDerivedMetrics(metersPerStep: Double, caloriesPerStep: Double)
 
     /**
-     * Atomically applies one sensor delta: bumps today's row and advances the
-     * persisted raw sensor baseline, all in a single transaction.
-     * @return the updated daily step total.
+     * Atomically folds one raw sensor reading into the day row and the sensor
+     * baseline. Reading the baseline, computing the delta and writing both rows
+     * happen inside ONE Room transaction, so concurrent sensor events can never
+     * double-count — even across processes or a slow coroutine dispatch.
+     *
+     * Delta rules:
+     *  - no baseline yet  -> adopt rawValue as baseline, delta = 0
+     *  - raw >= baseline  -> delta = raw - baseline (normal case)
+     *  - raw < baseline   -> the counter went backwards (reboot / sensor reset):
+     *                        delta = raw (everything since boot belongs to today)
+     *
+     * @return the new daily step total and the applied delta.
      */
     @Transaction
-    suspend fun recordSensorDelta(
+    suspend fun foldSensorReading(
         date: String,
-        deltaSteps: Long,
-        distanceDelta: Double,
-        caloriesDelta: Double,
         rawValue: Long,
+        metersPerStep: Double,
+        caloriesPerStep: Double,
         timestamp: Long
-    ): Int {
+    ): SensorFold {
+        val baseline = getSensorState()?.lastRawValue
+        val deltaSteps = SensorFoldLogic.computeDeltaSteps(baseline, rawValue)
+
         val current = getByDate(date)
         val updatedSteps = ((current?.steps ?: 0) + deltaSteps).coerceAtLeast(0L).toInt()
         upsertStep(
             StepEntity(
                 date = date,
                 steps = updatedSteps,
-                calories = (current?.calories ?: 0.0) + caloriesDelta,
-                distanceMeters = (current?.distanceMeters ?: 0.0) + distanceDelta,
+                calories = (current?.calories ?: 0.0) + deltaSteps * caloriesPerStep,
+                distanceMeters = (current?.distanceMeters ?: 0.0) + deltaSteps * metersPerStep,
                 updatedAt = timestamp
             )
         )
@@ -109,6 +121,6 @@ interface StepDao {
                 updatedAt = timestamp
             )
         )
-        return updatedSteps
+        return SensorFold(todaySteps = updatedSteps, deltaSteps = deltaSteps)
     }
 }

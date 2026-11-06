@@ -51,27 +51,19 @@ class FitnessRepository(
      */
     suspend fun recordSensorReading(rawValue: Long): SensorUpdate {
         val prefs = preferencesRepository.userPreferences.first()
-        val lastRaw = dao.getSensorState()?.lastRawValue
-
-        val deltaSteps: Long = when {
-            lastRaw == null -> 0L
-            rawValue >= lastRaw -> rawValue - lastRaw
-            else -> rawValue // sensor counter went backwards -> reboot/reset
-        }.coerceAtLeast(0L)
-
         val metersPerStep = prefs.strideLengthCm / 100.0
         val caloriesPerStep = FitnessCalculator.caloriesPerStep(prefs.bodyWeightKg.toDouble())
         val now = System.currentTimeMillis()
 
-        val newTodayTotal = dao.recordSensorDelta(
+        // Baseline read + delta + both writes happen inside one Room transaction.
+        val fold = dao.foldSensorReading(
             date = DateUtils.todayKey(),
-            deltaSteps = deltaSteps,
-            distanceDelta = deltaSteps * metersPerStep,
-            caloriesDelta = deltaSteps * caloriesPerStep,
             rawValue = rawValue,
+            metersPerStep = metersPerStep,
+            caloriesPerStep = caloriesPerStep,
             timestamp = now
         )
-        return SensorUpdate(todaySteps = newTodayTotal, deltaSteps = deltaSteps)
+        return SensorUpdate(todaySteps = fold.todaySteps, deltaSteps = fold.deltaSteps)
     }
 
     /**

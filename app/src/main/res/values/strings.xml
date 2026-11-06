@@ -7,6 +7,7 @@
     <string name="notification_channel_description">Ongoing notification shown while steps are counted in the background</string>
     <string name="notification_title">Counting steps</string>
     <string name="notification_starting">Starting step counter…</string>
+    <string name="notification_sensor_unavailable">Step sensor not available on this device</string>
     <string name="notification_steps_today">%1$d steps today</string>
     <string name="action_stop">Stop</string>
     <string name="action_open">Open</string>

@@ -67,7 +67,7 @@ class StepCounterService : Service(), SensorEventListener {
 
         if (stepSensor == null) {
             Log.w(TAG, "TYPE_STEP_COUNTER not available on this device")
-            updateNotification(getString(R.string.notification_steps_today, 0))
+            updateNotification(getString(R.string.notification_sensor_unavailable))
             AppGraph.isTracking.value = false
             stopSelf()
             return
@@ -222,8 +222,15 @@ class StepCounterService : Service(), SensorEventListener {
     }
 
     private fun stopTracking() {
-        serviceScope.launch {
-            runCatching { AppGraph.preferences().setBackgroundTrackingEnabled(false) }
+        // Persist the opt-out synchronously so it survives the immediate teardown
+        // that follows (serviceScope is cancelled in onDestroy). The write is a
+        // single small DataStore transaction — blocking for a few ms is fine here.
+        runCatching {
+            kotlinx.coroutines.runBlocking {
+                kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+                    AppGraph.preferences().setBackgroundTrackingEnabled(false)
+                }
+            }
         }
         stopForeground(STOP_FOREGROUND_REMOVE)
         stopSelf()
