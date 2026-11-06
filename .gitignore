@@ -1,0 +1,31 @@
+# Gradle / build
+.gradle/
+build/
+**/build/
+out/
+
+# Local machine config
+local.properties
+*.iml
+.idea/
+!.idea/codeStyles/
+!.idea/inspectionProfiles/
+
+# Android
+captures/
+.externalNativeBuild/
+.cxx/
+app/release/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Signing (never commit keystores)
+*.jks
+*.keystore
+keystore.properties
+
+# Companion test deps / artifacts
+companion/node_modules/
+companion/package-lock.json

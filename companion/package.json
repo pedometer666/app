@@ -1,0 +1,12 @@
+{
+  "name": "pedometer-companion",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Offline desktop companion for the Pedometer Android app: daily, monthly and yearly stat comparison.",
+  "scripts": {
+    "test": "node test/integration.test.js"
+  },
+  "devDependencies": {
+    "jsdom": "^25.0.1"
+  }
+}
