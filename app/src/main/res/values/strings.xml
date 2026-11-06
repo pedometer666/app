@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Pedometer</string>
+
+    <!-- Notification -->
+    <string name="notification_channel_name">Step tracking</string>
+    <string name="notification_channel_description">Ongoing notification shown while steps are counted in the background</string>
+    <string name="notification_title">Counting steps</string>
+    <string name="notification_starting">Starting step counter…</string>
+    <string name="notification_steps_today">%1$d steps today</string>
+    <string name="action_stop">Stop</string>
+    <string name="action_open">Open</string>
+
+    <!-- Permissions -->
+    <string name="permission_banner_title">Step counting paused</string>
+    <string name="permission_banner_body">Grant physical activity access so Pedometer can count your steps in the background, even when the app is closed.</string>
+    <string name="permission_allow">Allow access</string>
+    <string name="permission_open_settings">Open system settings</string>
+
+    <!-- Dashboard -->
+    <string name="steps_label">Steps</string>
+    <string name="goal_of">%1$s of %2$s step goal</string>
+    <string name="goal_reached">Goal reached</string>
+    <string name="distance_label">Distance</string>
+    <string name="calories_label">Calories</string>
+    <string name="today_sublabel">today</string>
+    <string name="active_sublabel">active burn</string>
+    <string name="tracking_active">Tracking</string>
+    <string name="tracking_paused">Paused</string>
+
+    <!-- Speedometer -->
+    <string name="speed_title">Speedometer</string>
+    <string name="speed_hint">Live — updates as you walk</string>
+    <string name="speed_kmh">km/h</string>
+    <string name="speed_mph">mph</string>
+
+    <!-- Monthly totals -->
+    <string name="month_total_label">Monthly total</string>
+    <string name="month_steps_label">steps this month</string>
+    <string name="month_distance_label">Distance</string>
+    <string name="month_calories_label">Calories</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
+    <string name="stride_length_label">Stride length</string>
+    <string name="stride_length_value">%1$.0f cm  ·  %2$.1f in</string>
+    <string name="body_weight_label">Body weight</string>
+    <string name="body_weight_value">%1$.0f kg  ·  %2$.0f lb</string>
+    <string name="daily_goal_label">Daily step goal</string>
+    <string name="daily_goal_value">%1$s steps</string>
+    <string name="units_label">Distance units</string>
+    <string name="unit_metric">Kilometres</string>
+    <string name="unit_imperial">Miles</string>
+    <string name="background_tracking_label">Background tracking</string>
+    <string name="background_tracking_body">Keep counting steps when the app is closed or after a reboot</string>
+    <string name="done">Done</string>
+
+    <!-- Navigation tabs -->
+    <string name="tab_dashboard">Dashboard</string>
+    <string name="tab_homebase">Homebase</string>
+
+    <!-- Homebase -->
+    <string name="homebase_title">Homebase</string>
+    <string name="homebase_subtitle">Trends, personal records and your data hub</string>
+    <string name="export_title">Export &amp; share data</string>
+    <string name="export_body">Full JSON package — daily history, profile and lifetime summary. Send it to any app, or load it into the Pedometer desktop companion to compare daily, monthly and yearly stats on a Chromebook or PC.</string>
+    <string name="export_action">Export &amp; Share Data</string>
+    <string name="export_chooser_title">Export Pedometer data</string>
+    <string name="export_failed">Could not create the export file</string>
+    <string name="homebase_weekly_title">Weekly trend</string>
+    <string name="homebase_weekly_caption">7-day rolling average</string>
+    <string name="steps_per_day">steps / day</string>
+    <string name="vs_previous_week">vs previous week</string>
+    <string name="week_no_baseline">no prior-week baseline</string>
+    <string name="homebase_month_title">Month vs. last month</string>
+    <string name="month_this">This month so far</string>
+    <string name="month_previous">Last month, same period</string>
+    <string name="month_detail">%1$s distance · %2$s kcal this month</string>
+    <string name="homebase_bests_title">Personal bests</string>
+    <string name="best_day_steps">Steps — best day</string>
+    <string name="best_day_distance">Distance — longest day</string>
+    <string name="homebase_streak_title">Goal streak</string>
+    <string name="streak_days">days at goal</string>
+    <string name="lifetime_steps">total steps</string>
+    <string name="active_days">active days</string>
+</resources>

@@ -1,0 +1,17 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path
+        android:fillColor="#0C1210"
+        android:pathData="M0,0h108v108h-108z" />
+    <!-- Soft emerald glow, top-right -->
+    <path
+        android:fillColor="#1A34D399"
+        android:pathData="M108,0 L108,46 A54,54 0 0,0 62,0 Z" />
+    <!-- Deep emerald accent, bottom-left -->
+    <path
+        android:fillColor="#140E9F6E"
+        android:pathData="M0,108 L0,64 A46,46 0 0,0 46,108 Z" />
+</vector>

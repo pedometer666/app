@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="brand_emerald">#34D399</color>
+    <color name="brand_emerald_deep">#0E9F6E</color>
+    <color name="brand_pine">#0C1210</color>
+    <color name="window_background">#0C1210</color>
+</resources>

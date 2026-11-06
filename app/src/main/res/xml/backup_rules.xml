@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<full-backup-content>
+    <!-- Keep the step history database in backups; DataStore preferences are small and worth keeping too. -->
+    <include domain="database" path="pedometer.db" />
+    <include domain="sharedpref" path="." />
+</full-backup-content>
