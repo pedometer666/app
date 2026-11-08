@@ -122,7 +122,7 @@ console.log('— invalid import (through the real file-input path) —');
           }, 2000);
     });
     input.dispatchEvent(new window.Event('change', { bubbles: true }));
-    const 
+
 const wasRejected = await invalidImportFeedback;
       ok(wasRejected, 'invalid export rejected with toast: ' + $('#toast').textContent);
       ok(!$('#empty-state').hidden, 'stays on empty state after rejected import');
