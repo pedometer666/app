@@ -36,6 +36,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.pedometer.app.R
+import com.pedometer.app.domain.HomebaseStats
 import com.pedometer.app.util.FormatUtils
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
