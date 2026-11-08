@@ -25,7 +25,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up JDK 17 (Temurin)
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: "17"
@@ -46,10 +46,28 @@ jobs:
           echo "ANDROID_HOME=${ANDROID_HOME:-unset}"
 
       - name: Unit tests
-        run: bash ./gradlew :app:testDebugUnitTest --stacktrace
+        run: |
+          set +e
+          bash ./gradlew :app:testDebugUnitTest --stacktrace 2>&1 | tee /tmp/gradle-unit.log
+          code=${PIPESTATUS[0]}
+          if [ "$code" -ne 0 ]; then
+            grep -nE "e: |FAILURE:|What went wrong|error:|Exception|FAILED" /tmp/gradle-unit.log | head -30 | while IFS= read -r line; do
+              echo "::error::$line"
+            done
+            exit $code
+          fi
 
       - name: Assemble debug APK
-        run: bash ./gradlew :app:assembleDebug --stacktrace
+        run: |
+          set +e
+          bash ./gradlew :app:assembleDebug --stacktrace 2>&1 | tee /tmp/gradle-assemble.log
+          code=${PIPESTATUS[0]}
+          if [ "$code" -ne 0 ]; then
+            grep -nE "e: |FAILURE:|What went wrong|error:|Exception|FAILED" /tmp/gradle-assemble.log | head -30 | while IFS= read -r line; do
+              echo "::error::$line"
+            done
+            exit $code
+          fi
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
