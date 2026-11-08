@@ -123,7 +123,7 @@ console.log('— invalid import (through the real file-input path) —');
     });
     input.dispatchEvent(new window.Event('change', { bubbles: true }));
     const 
-wasRejected = await invalidImportFeedback;
+const wasRejected = await invalidImportFeedback;
       ok(wasRejected, 'invalid export rejected with toast: ' + $('#toast').textContent);
       ok(!$('#empty-state').hidden, 'stays on empty state after rejected import');
       console.log(failures === 0 ? '\nALL COMPANION TESTS PASSED' : `\n${failures} FAILURES`);
