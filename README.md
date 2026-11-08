@@ -121,7 +121,9 @@ next open. Aggressive OEM battery managers may still kill the service; see
 ## How the sensor math survives reboots
 
 `TYPE_STEP_COUNTER` reports **cumulative steps since boot**; it never resets at midnight
-and zeroes on reboot. `FitnessRepository.recordSensorReading()` therefore:
+and zeroes on reboot. The foreground service queues readings and folds them one at a time,
+so delayed sensor callbacks cannot be mistaken for a device reboot. For each reading,
+`FitnessRepository.recordSensorReading()`:
 
 1. reads the last persisted raw value from Room (`sensor_state`),
 2. computes `delta = raw − lastRaw` (or `delta = raw` when the counter moved backwards → device rebooted),

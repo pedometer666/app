@@ -26,6 +26,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
@@ -46,11 +47,14 @@ import kotlinx.coroutines.launch
  */
 class StepCounterService : Service(), SensorEventListener {
 
+    private data class SensorReading(val rawValue: Long, val timestampMillis: Long)
+
     private lateinit var sensorManager: SensorManager
     private var stepSensor: Sensor? = null
     private var listenerRegistered = false
 
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    private val sensorReadings = Channel<SensorReading>(Channel.UNLIMITED)
     private val speedTracker = RollingSpeedTracker()
 
     /** Cumulative session steps; only used for the speed window, never for DB writes. */
@@ -71,6 +75,12 @@ class StepCounterService : Service(), SensorEventListener {
             AppGraph.isTracking.value = false
             stopSelf()
             return
+        }
+
+        serviceScope.launch {
+            for (reading in sensorReadings) {
+                processSensorReading(reading)
+            }
         }
 
         serviceScope.launch {
@@ -99,6 +109,7 @@ class StepCounterService : Service(), SensorEventListener {
             sensorManager.unregisterListener(this)
             listenerRegistered = false
         }
+        sensorReadings.close()
         serviceScope.cancel()
         speedTracker.clear()
         AppGraph.currentSpeedMps.value = 0f
@@ -112,25 +123,32 @@ class StepCounterService : Service(), SensorEventListener {
 
     override fun onSensorChanged(event: SensorEvent) {
         if (event.sensor.type != Sensor.TYPE_STEP_COUNTER) return
-        val rawValue = event.values[0].toLong()
-        val now = System.currentTimeMillis()
+        val result = sensorReadings.trySend(
+            SensorReading(
+                rawValue = event.values[0].toLong(),
+                timestampMillis = System.currentTimeMillis()
+            )
+        )
+        if (result.isFailure) {
+            Log.w(TAG, "Discarding step reading because the service is shutting down")
+        }
+    }
 
-        serviceScope.launch {
-            try {
-                val update = AppGraph.fitness().recordSensorReading(rawValue)
-                sessionSteps += update.deltaSteps
-                speedTracker.addSample(now, sessionSteps)
+    private suspend fun processSensorReading(reading: SensorReading) {
+        try {
+            val update = AppGraph.fitness().recordSensorReading(reading.rawValue)
+            sessionSteps += update.deltaSteps
+            speedTracker.addSample(reading.timestampMillis, sessionSteps)
 
-                val strideMeters =
-                    AppGraph.preferences().userPreferences.first().strideLengthCm / 100.0
-                AppGraph.currentSpeedMps.value =
-                    speedTracker.speedMetersPerSecond(strideMeters).toFloat()
+            val strideMeters =
+                AppGraph.preferences().userPreferences.first().strideLengthCm / 100.0
+            AppGraph.currentSpeedMps.value =
+                speedTracker.speedMetersPerSecond(strideMeters).toFloat()
 
-                maybeUpdateNotification(update.todaySteps, now)
-            } catch (exception: Exception) {
-                // Never let a DB hiccup kill the sensor pipeline.
-                Log.e(TAG, "Failed to record sensor reading", exception)
-            }
+            maybeUpdateNotification(update.todaySteps, reading.timestampMillis)
+        } catch (exception: Exception) {
+            // Never let a DB hiccup kill the sensor pipeline.
+            Log.e(TAG, "Failed to record sensor reading", exception)
         }
     }
 
