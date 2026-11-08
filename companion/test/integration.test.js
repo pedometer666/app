@@ -103,14 +103,23 @@ ok(window.localStorage.getItem('pedometer.companion.export') === null, 'localSto
 
 console.log('— invalid import (through the real file-input path) —');
 (async () => {
-  const badFile = new window.File(['{"app":"not-pedometer","schemaVersion":1,"days":[]}'], 'bad.json', { type: 'application/json' });
-  const input = $('#file-input');
-  Object.defineProperty(input, 'files', { value: [badFile], configurable: true });
-  input.dispatchEvent(new window.Event('change', { bubbles: true }));
-  await new Promise((resolve) => setTimeout(resolve, 100));
-  ok(/pedometer/i.test($('#toast').textContent), 'invalid export rejected with toast: ' + $('#toast').textContent);
-  ok(!$('#empty-state').hidden, 'stays on empty state after rejected import');
-  console.log(failures === 0 ? '\nALL COMPANION TESTS PASSED' : `\n${failures} FAILURES`);
-  process.exit(failures === 0 ? 0 : 1);
-})();
-
+    const badFile = new window.File(['{"app":"not-pedometer","schemaVersion":1,"days":[]}'], 'bad.json', { type: 'application/json' });
+    const input = $('#file-input');
+    Object.defineProperty(input, 'files', { value: [badFile], configurable: true });
+    const invalidImportFeedback = new Promise((resolve) => {
+          const toast = $('#toast');
+          const observer = new window.MutationObserver(() => {
+                  if (/not a pedometer export/i.test(toast.textContent)) {
+                            observer.disconnect();
+                            clearTimeout(timeoutId);
+                            resolve(true);
+                  }
+          });
+          observer.observe(toast, { childList: true, characterData: true, subtree: true });
+          const timeoutId = setTimeout(() => {
+                  observer.disconnect();
+                  resolve(false);
+          }, 2000);
+    });
+    input.dispatchEvent(new window.Event('change', { bubbles: true }));
+    const 
