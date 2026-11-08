@@ -1,0 +1,79 @@
+# Build + unit-test CI for the Pedometer repo.
+#
+# This is the real compile signal for the Android app (authoring sandbox had no
+# JDK). Requires Google Maven + Gradle distribution download, which GitHub-hosted
+# runners can reach.
+name: build
+
+on:
+  push:
+    branches:
+      - main
+      - arena/c07bf140-app
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  android:
+    name: Android (unit tests + assembleDebug)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17 (Temurin)
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      # Gradle wrapper validation + dependency/build cache.
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      # GitHub ubuntu images ship the Android SDK with API 35 + build-tools and
+      # pre-accepted licenses; on images where sdkmanager exists this is a no-op,
+      # otherwise it installs what's missing.
+      - name: Ensure Android SDK 35 toolchain
+        run: |
+          if command -v sdkmanager >/dev/null 2>&1; then
+            yes | sdkmanager --licenses >/dev/null 2>&1 || true
+            sdkmanager "platforms;android-35" "build-tools;35.0.0" || true
+          fi
+          echo "ANDROID_HOME=${ANDROID_HOME:-unset}"
+
+      - name: Unit tests
+        run: bash ./gradlew :app:testDebugUnitTest --stacktrace
+
+      - name: Assemble debug APK
+        run: bash ./gradlew :app:assembleDebug --stacktrace
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-debug
+          path: app/build/outputs/apk/debug/*.apk
+          if-no-files-found: warn
+          retention-days: 14
+
+  companion:
+    name: Companion web app (jsdom integration suite)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install + run integration tests
+        run: |
+          cd companion
+          npm install
+          npm test
