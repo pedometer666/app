@@ -34,8 +34,8 @@ class RollingSpeedTrackerTest {
         tracker.addSample(timestampMillis = 0, cumulativeSteps = 0)
         tracker.addSample(timestampMillis = 10_000, cumulativeSteps = 20)
 
-        assertEquals(1.4, tracker.stepsPerSecond()!!, 0.0001)
-        assertEquals(1.4 * 0.75, tracker.speedMetersPerSecond(0.75), 0.0001)
+        assertEquals(2.0, tracker.stepsPerSecond()!!, 0.0001)
+        assertEquals(2.0 * 0.75, tracker.speedMetersPerSecond(0.75), 0.0001)
     }
 
     @Test
