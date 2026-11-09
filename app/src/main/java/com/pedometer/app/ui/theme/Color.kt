@@ -2,27 +2,32 @@ package com.pedometer.app.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// Brand palette — deep pine background with an emerald accent.
-val Emerald = Color(0xFF34D399)
-val EmeraldDeep = Color(0xFF0E9F6E)
-val Pine = Color(0xFF0C1210)
+// Lillyhop's sea-glass, lagoon, ocean, and warm sand palette.
+val SeaGlass = Color(0xFF80CBAA)
+val Lagoon = Color(0xFF286B56)
+val Ocean = Color(0xFF83C5D1)
+val Sand = Color(0xFFE9C58E)
 
 // Dark scheme
-val DarkBackground = Color(0xFF0C1210)
-val DarkSurface = Color(0xFF111A16)
-val DarkSurfaceVariant = Color(0xFF223029)
-val DarkOnBackground = Color(0xFFE3EDE7)
-val DarkOnVariant = Color(0xFFA9BDB2)
-val DarkAmber = Color(0xFFFCD34D)
+val DarkBackground = Color(0xFF101D1B)
+val DarkSurface = Color(0xFF172724)
+val DarkSurfaceVariant = Color(0xFF293D38)
+val DarkOnBackground = Color(0xFFE5F0E9)
+val DarkOnVariant = Color(0xFFB4C9BE)
+val DarkSand = Color(0xFFF0CC91)
 
 // Light scheme
-val LightBackground = Color(0xFFF4F9F6)
-val LightSurface = Color(0xFFFFFFFF)
-val LightPrimary = Color(0xFF0B6E4F)
-val LightPrimaryContainer = Color(0xFFB7F5D6)
+val LightBackground = Color(0xFFFAF7EE)
+val LightSurface = Color(0xFFFFFEFA)
+val LightPrimary = Color(0xFF286B56)
+val LightPrimaryContainer = Color(0xFFD8EEE1)
 val LightOnPrimary = Color(0xFFFFFFFF)
-val LightOnPrimaryContainer = Color(0xFF073B28)
-val LightSecondary = Color(0xFF3F5A4C)
-val LightOnSurface = Color(0xFF18231D)
-val LightOnVariant = Color(0xFF4B5A52)
-val LightAmber = Color(0xFFB45309)
+val LightOnPrimaryContainer = Color(0xFF183D30)
+val LightSecondary = Color(0xFF397889)
+val LightSecondaryContainer = Color(0xFFD9EDF0)
+val LightOnSecondaryContainer = Color(0xFF153C45)
+val LightTertiary = Color(0xFF8A6232)
+val LightTertiaryContainer = Color(0xFFF3E3C6)
+val LightOnTertiaryContainer = Color(0xFF493316)
+val LightOnSurface = Color(0xFF1D2924)
+val LightOnVariant = Color(0xFF4C5D54)

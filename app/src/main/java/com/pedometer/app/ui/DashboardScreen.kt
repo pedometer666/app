@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DirectionsWalk
 import androidx.compose.material.icons.filled.LocalFireDepartment
@@ -69,6 +70,9 @@ fun DashboardScreen(
             .padding(horizontal = 20.dp)
     ) {
         Spacer(Modifier.height(8.dp))
+
+        LillyhopWelcome()
+        Spacer(Modifier.height(12.dp))
 
         DateAndStatusRow(isTracking = uiState.isTracking)
         Spacer(Modifier.height(12.dp))
@@ -131,6 +135,32 @@ fun DashboardScreen(
         )
 
         Spacer(Modifier.height(28.dp))
+    }
+}
+
+@Composable
+private fun LillyhopWelcome() {
+    Surface(
+        shape = RoundedCornerShape(18.dp),
+        color = MaterialTheme.colorScheme.primaryContainer,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 10.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "\uD83D\uDC38",
+                style = MaterialTheme.typography.titleLarge
+            )
+            Spacer(Modifier.width(10.dp))
+            Text(
+                text = stringResource(R.string.dashboard_welcome),
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onPrimaryContainer
+            )
+        }
     }
 }
 

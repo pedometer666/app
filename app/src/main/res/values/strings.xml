@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Pedometer</string>
+    <string name="app_name">Lillyhop</string>
+    <string name="dashboard_welcome">Little hops add up</string>
 
     <!-- Notification -->
     <string name="notification_channel_name">Step tracking</string>
@@ -14,7 +15,7 @@
 
     <!-- Permissions -->
     <string name="permission_banner_title">Step counting paused</string>
-    <string name="permission_banner_body">Grant physical activity access so Pedometer can count your steps in the background, even when the app is closed.</string>
+    <string name="permission_banner_body">Grant physical activity access so Lillyhop can count your steps in the background, even when the app is closed.</string>
     <string name="permission_allow">Allow access</string>
     <string name="permission_open_settings">Open system settings</string>
 
@@ -55,7 +56,7 @@
     <string name="background_tracking_label">Background tracking</string>
     <string name="background_tracking_body">Keep counting steps when the app is closed or after a reboot</string>
     <string name="premium_unlock">Unlock Premium</string>
-    <string name="premium_title">Pedometer Premium</string>
+    <string name="premium_title">Lillyhop Premium</string>
     <string name="premium_description">One payment unlocks background tracking, Homebase insights and data export, with no ads.</string>
     <string name="premium_feature_background">• Keep counting in the background and after a reboot</string>
     <string name="premium_feature_homebase">• Unlock Homebase trends and personal records</string>
@@ -80,9 +81,9 @@
     <string name="homebase_title">Homebase</string>
     <string name="homebase_subtitle">Trends, personal records and your data hub</string>
     <string name="export_title">Export &amp; share data</string>
-    <string name="export_body">Full JSON package — daily history, profile and lifetime summary. Send it to any app, or load it into the Pedometer desktop companion to compare daily, monthly and yearly stats on a Chromebook or PC.</string>
+    <string name="export_body">Full JSON package — daily history, profile and lifetime summary. Send it to any app, or load it into the Lillyhop desktop companion to compare daily, monthly and yearly stats on a Chromebook or PC.</string>
     <string name="export_action">Export &amp; Share Data</string>
-    <string name="export_chooser_title">Export Pedometer data</string>
+    <string name="export_chooser_title">Export Lillyhop data</string>
     <string name="export_failed">Could not create the export file</string>
     <string name="homebase_weekly_title">Weekly trend</string>
     <string name="homebase_weekly_caption">7-day rolling average</string>

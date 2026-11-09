@@ -1,0 +1,739 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7f5eb">
+  <title>Lillyhop — little hops add up</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --paper: #f7f5eb;
+      --white: #fffefa;
+      --ink: #1d2924;
+      --muted: #62736a;
+      --line: #e4e9e1;
+      --lagoon: #286b56;
+      --lagoon-deep: #173d32;
+      --green: #80cbaa;
+      --mint: #d8eee1;
+      --ocean: #397889;
+      --sky: #83c5d1;
+      --sand: #e9c58e;
+      --sand-soft: #f4e8d0;
+      --shadow: 0 24px 70px rgba(35, 67, 55, .12);
+      --sans: "Avenir Next", Avenir, "Segoe UI", sans-serif;
+      --serif: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: var(--sans);
+      background:
+        radial-gradient(ellipse at 10% 12%, rgba(128, 203, 170, .17), transparent 28rem),
+        radial-gradient(ellipse at 92% 38%, rgba(131, 197, 209, .15), transparent 25rem),
+        var(--paper);
+      -webkit-font-smoothing: antialiased;
+    }
+    button, input { font: inherit; }
+    button { color: inherit; }
+    button:focus-visible, input:focus-visible, a:focus-visible {
+      outline: 3px solid #397889;
+      outline-offset: 3px;
+    }
+    .page-shell { max-width: 1540px; margin: auto; padding: 28px clamp(18px, 4vw, 64px) 48px; }
+    .topbar { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+    .brand { display: inline-flex; align-items: center; gap: 11px; color: var(--lagoon-deep); text-decoration: none; }
+    .brand-mark {
+      display: grid; place-items: center; width: 42px; height: 42px;
+      border: 1px solid rgba(40, 107, 86, .16); border-radius: 15px;
+      background: rgba(255, 254, 250, .8);
+    }
+    .brand-name { font-family: var(--serif); font-size: 24px; letter-spacing: -.055em; font-weight: 700; }
+    .brand-caption { margin-left: 1px; color: #74857b; font-size: 10px; letter-spacing: .16em; text-transform: uppercase; }
+    .preview-tag {
+      display: inline-flex; align-items: center; gap: 9px; padding: 9px 13px;
+      border: 1px solid #e3e7dd; border-radius: 999px; background: rgba(255,255,255,.55);
+      color: #5a6c61; font-size: 11px; letter-spacing: .12em; text-transform: uppercase;
+    }
+    .preview-tag::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: #d19b54; box-shadow: 0 0 0 4px #f4e8d0; }
+
+    .intro { padding: clamp(42px, 7vw, 86px) 0 36px; max-width: 750px; }
+    .eyebrow { margin: 0 0 13px; color: var(--lagoon); font-size: 11px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; }
+    h1, h2, h3, p { margin-top: 0; }
+    h1 { margin-bottom: 15px; font-family: var(--serif); font-size: clamp(42px, 6vw, 76px); line-height: .99; letter-spacing: -.065em; font-weight: 500; }
+    h1 em { color: var(--lagoon); font-weight: 500; }
+    .intro-copy { max-width: 580px; margin: 0; color: #637269; font-size: clamp(15px, 1.5vw, 18px); line-height: 1.7; }
+    .intro-copy strong { color: var(--ink); font-weight: 650; }
+
+    .preview-grid {
+      display: grid; grid-template-columns: minmax(310px, .76fr) minmax(0, 1.7fr);
+      align-items: start; gap: clamp(18px, 3vw, 40px);
+    }
+    .showcase { position: relative; overflow: hidden; border: 1px solid rgba(40,107,86,.12); border-radius: 28px; }
+    .phone-stage {
+      min-height: 810px; padding: 27px 22px 24px;
+      background:
+        radial-gradient(ellipse at 2% 55%, rgba(255,255,255,.75), transparent 34%),
+        linear-gradient(147deg, #dcefe4 0%, #cce5d8 42%, #b4d7ca 100%);
+    }
+    .stage-head { position: relative; z-index: 1; display: flex; justify-content: space-between; align-items: center; margin: 0 1px 21px; }
+    .stage-label { color: #315a49; font-size: 10px; font-weight: 750; letter-spacing: .17em; text-transform: uppercase; }
+    .stage-index { color: rgba(40, 87, 67, .62); font-size: 11px; font-variant-numeric: tabular-nums; }
+    .sun-disc { position: absolute; width: 146px; height: 146px; right: -54px; top: 91px; border-radius: 50%; background: rgba(247, 226, 182, .76); }
+    .shoreline { position: absolute; width: 180px; height: 125px; left: -57px; bottom: 60px; border-radius: 50% 50% 0 0; background: rgba(128,203,170,.34); transform: rotate(-15deg); }
+    .lily { position: absolute; right: 12px; bottom: 77px; width: 98px; height: 48px; border-radius: 100% 0 100% 0; background: rgba(40,107,86,.43); transform: rotate(-8deg); }
+    .lily::after { content: ""; position: absolute; top: 0; right: 3px; width: 22px; height: 22px; border-radius: 50%; border-left: 2px solid rgba(220,239,228,.8); transform: rotate(38deg); }
+
+    .phone {
+      position: relative; z-index: 2; width: min(100%, 326px); min-height: 690px; margin: auto;
+      padding: 9px; border: 1px solid rgba(10,25,20,.78); border-radius: 42px;
+      background: #101b17; box-shadow: 0 28px 55px rgba(26, 61, 46, .26), inset 0 0 0 1px rgba(255,255,255,.13);
+    }
+    .phone-inner { min-height: 670px; padding: 0 19px 13px; overflow: hidden; border-radius: 33px; color: #eaf3ed; background: #12201b; }
+    .phone-status { height: 28px; display: flex; align-items: center; justify-content: space-between; padding: 0 5px; font-size: 10px; color: rgba(232,244,237,.82); font-variant-numeric: tabular-nums; }
+    .camera-pill { width: 62px; height: 16px; margin: -20px auto 4px; border-radius: 0 0 12px 12px; background: #101b17; }
+    .phone-top { display: flex; justify-content: space-between; align-items: center; padding: 9px 1px 20px; }
+    .phone-greeting { margin: 0 0 3px; color: #a7c8b7; font-size: 11px; }
+    .phone-title { margin: 0; font-family: var(--serif); font-size: 22px; letter-spacing: -.035em; font-weight: 600; }
+    .frog-chip { display: grid; place-items: center; width: 39px; height: 39px; border: 1px solid rgba(169,220,192,.25); border-radius: 14px; background: #1d352b; }
+    .phone-date { margin: 0 0 15px; color: #a2b8ab; font-size: 11px; }
+    .goal-panel { position: relative; padding: 22px 16px 18px; border: 1px solid rgba(184,221,197,.1); border-radius: 23px; background: linear-gradient(155deg, #1d3329, #182a23); }
+    .goal-label { margin: 0 0 16px; color: #c4d9cb; text-align: center; font-size: 11px; letter-spacing: .02em; }
+    .goal-ring {
+      --progress: 72%;
+      display: grid; place-items: center; width: 185px; height: 185px; margin: auto;
+      border-radius: 50%;
+      background: conic-gradient(from -90deg, #80cbaa 0 var(--progress), #34473d var(--progress) 100%);
+      box-shadow: 0 0 32px rgba(128,203,170,.09);
+      animation: ring-in .85s cubic-bezier(.16,.84,.3,1) both;
+    }
+    .goal-ring::before { content: ""; position: absolute; width: 159px; height: 159px; border-radius: 50%; background: #1b2e26; }
+    .ring-content { position: relative; text-align: center; }
+    .step-number { display: block; color: #fbfff9; font-size: 36px; line-height: 1; letter-spacing: -.055em; font-weight: 730; font-variant-numeric: tabular-nums; }
+    .step-caption { display: block; margin-top: 7px; color: #a8c0b1; font-size: 10px; letter-spacing: .04em; }
+    .goal-target { margin: 13px 0 0; color: #d3e2d7; text-align: center; font-size: 11px; }
+    .goal-target strong { color: #f3d9aa; font-weight: 650; }
+    .encouragement { display: flex; align-items: flex-start; gap: 10px; margin: 14px 0 0; color: #d7e8dc; font-size: 12px; line-height: 1.45; }
+    .spark { flex: 0 0 auto; color: #f1ca83; font-size: 15px; line-height: 1; }
+    .mini-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 13px; }
+    .mini-stat { min-height: 82px; padding: 13px 12px; border: 1px solid rgba(184,221,197,.1); border-radius: 16px; background: #192b23; }
+    .mini-stat-top { display: flex; align-items: center; gap: 7px; color: #a8c2b2; font-size: 10px; }
+    .mini-stat-value { margin: 9px 0 0; color: #f6f7ee; font-size: 19px; line-height: 1; font-weight: 660; letter-spacing: -.035em; font-variant-numeric: tabular-nums; }
+    .mini-stat-value small { color: #b6c8bd; font-size: 11px; font-weight: 500; letter-spacing: 0; }
+    .tracking { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 14px; padding: 11px 12px; border-radius: 14px; color: #c7d9cd; background: #1b3027; font-size: 10px; }
+    .tracking-state { display: inline-flex; align-items: center; gap: 7px; color: #b6dfc4; }
+    .tracking-state::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: #80cbaa; box-shadow: 0 0 0 3px rgba(128,203,170,.13); }
+    .phone-home-view { display: none; }
+    .phone-home-view.is-active { display: block; animation: fade-up .3s ease both; }
+    .phone-dashboard-view.is-inactive { display: none; }
+    .homebase-card { margin: 0 0 12px; padding: 17px; border-radius: 19px; background: linear-gradient(135deg,#203b2e,#1a2c23); }
+    .homebase-card h3 { margin: 0 0 6px; font-family: var(--serif); font-size: 20px; font-weight: 600; }
+    .homebase-card p { margin: 0; color: #b8cdbf; font-size: 11px; line-height: 1.55; }
+    .week-strip { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin: 16px 0 14px; }
+    .week-day { display: grid; gap: 8px; justify-items: center; color: #92ae9d; font-size: 9px; }
+    .week-day b { display: grid; place-items: center; width: 27px; height: 27px; border-radius: 50%; color: #d8e6db; background: #2b4034; font-size: 9px; font-weight: 600; }
+    .week-day.hit b { color: #153528; background: #80cbaa; }
+    .week-day.today b { outline: 1px solid #e9c58e; outline-offset: 2px; }
+    .home-summary { display: grid; gap: 9px; }
+    .home-line { display: flex; justify-content: space-between; padding: 12px 13px; border: 1px solid rgba(184,221,197,.1); border-radius: 14px; color: #b3c9ba; font-size: 11px; }
+    .home-line strong { color: #f5f4e9; font-weight: 620; }
+    .phone-nav { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 14px; padding: 5px; border: 1px solid rgba(184,221,197,.1); border-radius: 18px; background: #172820; }
+    .nav-item { display: flex; align-items: center; justify-content: center; gap: 7px; min-height: 40px; padding: 6px; border: 0; border-radius: 13px; color: #8fa99a; background: transparent; cursor: pointer; font-size: 10px; font-weight: 600; transition: background .2s, color .2s, transform .2s; }
+    .nav-item:hover { transform: translateY(-1px); }
+    .nav-item[aria-current="page"] { color: #d9f0e2; background: #294536; }
+
+    .desktop-stage { min-width: 0; min-height: 810px; padding: 27px clamp(14px, 2.4vw, 34px) 24px; background: linear-gradient(155deg, #fbfaf5 0%, #f6f4eb 100%); }
+    .desktop-app {
+      position: relative; z-index: 1; min-height: 690px; overflow: hidden;
+      border: 1px solid #e2e8df; border-radius: 20px; background: var(--white);
+      box-shadow: 0 20px 58px rgba(45,76,61,.10);
+    }
+    .appbar { height: 58px; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 0 21px; border-bottom: 1px solid #edf0e9; }
+    .app-wordmark { display: flex; align-items: center; gap: 9px; font-family: var(--serif); color: var(--lagoon-deep); font-weight: 700; font-size: 17px; letter-spacing: -.04em; }
+    .app-wordmark .brand-mark { width: 30px; height: 30px; border-radius: 10px; background: #edf6ef; }
+    .app-wordmark svg { width: 20px; height: 20px; }
+    .appbar-right { display: flex; align-items: center; gap: 13px; color: #7d8c82; font-size: 10px; }
+    .local-badge { display: flex; align-items: center; gap: 6px; color: #526b5b; }
+    .local-badge svg { color: var(--lagoon); }
+    .avatar { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; color: #345b49; background: #e4f0e6; font-size: 10px; font-weight: 700; }
+    .app-content { padding: 22px clamp(14px, 2vw, 26px) 20px; }
+    .dashboard-heading { display: flex; justify-content: space-between; align-items: flex-start; gap: 15px; }
+    .dashboard-heading h2 { margin: 0 0 4px; font-family: var(--serif); font-size: clamp(24px, 2.3vw, 31px); font-weight: 600; letter-spacing: -.045em; }
+    .dashboard-heading p { margin: 0; color: #77877d; font-size: 11px; }
+    .period-control { display: flex; align-items: center; gap: 2px; padding: 3px; border: 1px solid #e9ede5; border-radius: 12px; background: #f7f8f3; }
+    .period-button { min-height: 31px; padding: 0 10px; border: 0; border-radius: 9px; color: #738178; background: transparent; cursor: pointer; font-size: 10px; font-weight: 600; transition: .18s ease; }
+    .period-button:hover { color: var(--lagoon); background: #eaf3eb; }
+    .period-button[aria-pressed="true"] { color: #fff; background: var(--lagoon); box-shadow: 0 2px 6px rgba(40,107,86,.2); }
+    .kpi-grid { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 9px; margin: 20px 0 14px; }
+    .kpi { min-width: 0; padding: 13px 13px 12px; border: 1px solid #e8ede6; border-radius: 14px; background: #fff; }
+    .kpi:nth-child(1) { border-top: 2px solid #80cbaa; }
+    .kpi:nth-child(2) { border-top: 2px solid #83c5d1; }
+    .kpi:nth-child(3) { border-top: 2px solid #e9c58e; }
+    .kpi:nth-child(4) { border-top: 2px solid #a7c9a7; }
+    .kpi-label { display: block; overflow: hidden; color: #75867b; font-size: 9px; text-overflow: ellipsis; white-space: nowrap; }
+    .kpi-value { display: block; margin-top: 8px; color: #20352a; font-size: clamp(15px, 1.6vw, 21px); line-height: 1; letter-spacing: -.04em; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .kpi-note { display: block; margin-top: 6px; color: #8d9b91; font-size: 9px; white-space: nowrap; }
+    .chart-panel { padding: 15px 15px 11px; border: 1px solid #e7ece5; border-radius: 16px; background: #fff; }
+    .chart-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 7px; }
+    .chart-head h3 { margin: 0; color: #2a3c31; font-size: 12px; font-weight: 700; }
+    .chart-legend { display: flex; align-items: center; gap: 12px; color: #77877e; font-size: 9px; }
+    .legend-item { display: inline-flex; align-items: center; gap: 5px; }
+    .legend-mark { display: inline-block; width: 13px; height: 2px; border-radius: 2px; background: #397889; }
+    .legend-mark.goal { height: 0; border-top: 1px dashed #c59c5c; background: transparent; }
+    .legend-mark.previous { background: #b8d2bf; }
+    .chart-wrap { position: relative; width: 100%; }
+    .trend-chart { display: block; width: 100%; height: auto; overflow: visible; }
+    .chart-gridline { stroke: #edf0e9; stroke-width: 1; }
+    .chart-axis-label { fill: #8b998f; font-family: var(--sans); font-size: 10px; }
+    .goal-line { stroke: #c59c5c; stroke-width: 1.5; stroke-dasharray: 5 5; }
+    .series-fill { fill: url(#areaFill); }
+    .series-line { fill: none; stroke: #397889; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+    .previous-line { fill: none; stroke: #b8d2bf; stroke-width: 2; stroke-dasharray: 4 5; stroke-linecap: round; stroke-linejoin: round; }
+    .chart-dot { fill: #fffefa; stroke: #397889; stroke-width: 3; }
+    .chart-dot.selected { fill: #e9c58e; stroke: #fffefa; stroke-width: 3; }
+    .chart-bottom-label { fill: #839187; font-family: var(--sans); font-size: 10px; }
+    .chart-selection { margin: 0 1px; color: #78877e; font-size: 10px; }
+    .chart-selection strong { color: #30483a; font-weight: 650; }
+    .lower-grid { display: grid; grid-template-columns: minmax(0,1.35fr) minmax(170px,.8fr); gap: 10px; margin-top: 11px; }
+    .period-summary, .activity-list { min-width: 0; padding: 13px 14px; border: 1px solid #e7ece5; border-radius: 14px; background: #fff; }
+    .subhead { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 11px; }
+    .subhead h3 { margin: 0; color: #304239; font-size: 11px; font-weight: 700; }
+    .subhead span { color: #829087; font-size: 9px; }
+    .summary-values { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .summary-item span { display: block; color: #829087; font-size: 9px; }
+    .summary-item strong { display: block; margin-top: 4px; color: #30483a; font-size: 13px; font-weight: 680; font-variant-numeric: tabular-nums; }
+    .activity-row { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; padding: 6px 0; border-top: 1px solid #f0f2ed; font-size: 9px; }
+    .activity-row:first-of-type { border-top: 0; }
+    .activity-date { color: #64746a; white-space: nowrap; }
+    .activity-steps { color: #30483a; font-weight: 650; font-variant-numeric: tabular-nums; }
+    .toolbar { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 14px; }
+    .data-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+    .tool-button {
+      display: inline-flex; min-height: 31px; align-items: center; justify-content: center; gap: 6px;
+      padding: 0 10px; border: 1px solid #dfe7de; border-radius: 9px; color: #4a6654;
+      background: #fff; cursor: pointer; font-size: 9px; font-weight: 650; transition: .18s ease;
+    }
+    .tool-button:hover { border-color: #9dc9aa; color: #1e5c43; background: #f1f8f1; }
+    .tool-button.primary { border-color: var(--lagoon); color: white; background: var(--lagoon); }
+    .tool-button.primary:hover { border-color: #1c503e; background: #1c503e; }
+    .tool-button svg { width: 13px; height: 13px; }
+    .data-note { display: flex; align-items: center; gap: 6px; color: #829087; font-size: 9px; white-space: nowrap; }
+    .data-note svg { flex: 0 0 auto; color: var(--lagoon); }
+    .file-input { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; clip-path: inset(50%); }
+    .toast { position: absolute; z-index: 5; right: 16px; bottom: 16px; max-width: calc(100% - 32px); padding: 10px 13px; border-radius: 11px; color: #f7fff9; background: #1c4937; box-shadow: 0 8px 26px rgba(20,54,38,.22); font-size: 11px; opacity: 0; transform: translateY(8px); pointer-events: none; transition: opacity .2s, transform .2s; }
+    .toast.is-visible { opacity: 1; transform: translateY(0); }
+    .page-foot { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 20px 2px 0; color: #718076; font-size: 10px; }
+    .page-foot strong { color: #42614e; font-weight: 650; }
+    .foot-note { display: flex; align-items: center; gap: 8px; }
+    .foot-note svg { color: var(--lagoon); }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+
+    @keyframes ring-in { from { background: conic-gradient(from -90deg, #80cbaa 0 0%, #34473d 0 100%); transform: scale(.94); } to { transform: scale(1); } }
+    @keyframes fade-up { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+    @media (max-width: 1120px) {
+      .preview-grid { grid-template-columns: minmax(290px, .74fr) minmax(0, 1.45fr); gap: 17px; }
+      .phone-stage, .desktop-stage { padding-left: 14px; padding-right: 14px; }
+      .kpi-grid { gap: 6px; }
+      .kpi { padding-left: 9px; padding-right: 9px; }
+    }
+    @media (max-width: 850px) {
+      .intro { padding-top: 53px; }
+      .preview-grid { grid-template-columns: minmax(0, 1fr); }
+      .phone-stage, .desktop-stage { min-height: 0; padding: 23px 20px; }
+      .phone { width: 326px; max-width: 100%; }
+      .desktop-app { max-width: 760px; margin: auto; }
+      .phone-stage { background:
+        radial-gradient(ellipse at 10% 55%, rgba(255,255,255,.75), transparent 34%),
+        linear-gradient(147deg, #dcefe4 0%, #cce5d8 42%, #b4d7ca 100%); }
+      .phone-stage .sun-disc { right: 6%; top: 92px; }
+      .phone-stage .lily { right: 7%; bottom: 70px; }
+    }
+    @media (max-width: 560px) {
+      .page-shell { padding: 17px 13px 26px; }
+      .topbar { align-items: flex-start; }
+      .brand-caption { display: none; }
+      .preview-tag { margin-top: 3px; padding: 8px 10px; font-size: 9px; }
+      .intro { padding: 44px 3px 25px; }
+      h1 { font-size: clamp(40px, 12vw, 57px); }
+      .intro-copy { font-size: 14px; }
+      .phone-stage { padding: 19px 12px; border-radius: 23px; }
+      .desktop-stage { padding: 14px 8px; border-radius: 23px; }
+      .stage-head { margin: 0 5px 16px; }
+      .desktop-app { border-radius: 16px; }
+      .appbar { height: 50px; padding: 0 13px; }
+      .local-badge { max-width: 120px; font-size: 9px; }
+      .app-content { padding: 17px 11px 13px; }
+      .dashboard-heading { display: block; }
+      .period-control { width: 100%; margin-top: 13px; }
+      .period-button { flex: 1; padding: 0 5px; }
+      .kpi-grid { grid-template-columns: repeat(2, minmax(0,1fr)); margin-top: 13px; }
+      .kpi { padding: 12px; }
+      .kpi-value { font-size: 19px; }
+      .chart-panel { padding: 12px 9px 9px; }
+      .chart-head { align-items: flex-start; }
+      .chart-legend { gap: 8px; font-size: 8px; }
+      .chart-axis-label, .chart-bottom-label { font-size: 9px; }
+      .lower-grid { grid-template-columns: 1fr; }
+      .toolbar { align-items: flex-start; flex-direction: column; }
+      .data-actions { width: 100%; }
+      .tool-button { flex: 1; min-width: 78px; }
+      .data-note { white-space: normal; }
+      .page-foot { align-items: flex-start; flex-direction: column; gap: 8px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+    }
+    @media print {
+      body { background: white; }
+      .page-shell { max-width: none; padding: 0; }
+      .topbar, .intro, .phone-stage, .preview-tag, .data-actions, .page-foot { display: none !important; }
+      .preview-grid { display: block; }
+      .desktop-stage { min-height: 0; padding: 0; border: 0; background: white; }
+      .desktop-app { border: 0; box-shadow: none; }
+      .toast { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page-shell">
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="Lillyhop preview home">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 32 32" width="27" height="27" fill="none">
+            <path d="M5 19.3c3.4-5.7 14.5-8.6 21.3-3.1-1.6 6.1-6.1 9.5-12.5 8.6-4.1-.6-7.1-2.7-8.8-5.5Z" fill="#80cbaa"/>
+            <path d="M7.1 18.9c3.1 2.4 8.7 3.4 15.5 1.7M20.1 17.4l3.2-2.5" stroke="#286b56" stroke-width="1.25" stroke-linecap="round"/>
+            <circle cx="13.3" cy="12.2" r="3.3" fill="#e9c58e"/>
+            <circle cx="11.5" cy="11.2" r=".7" fill="#173d32"/><circle cx="15.1" cy="11.2" r=".7" fill="#173d32"/>
+            <path d="M12.1 13.2c.7.6 1.5.6 2.3 0" stroke="#173d32" stroke-width=".8" stroke-linecap="round"/>
+          </svg>
+        </span>
+        <span><span class="brand-name">lillyhop</span><span class="brand-caption">a gentle step counter</span></span>
+      </a>
+      <span class="preview-tag">A little concept preview</span>
+    </header>
+
+    <section class="intro" aria-labelledby="page-title">
+      <p class="eyebrow">A kinder way to keep moving</p>
+      <h1 id="page-title">Good things happen <em>one hop at a time.</em></h1>
+      <p class="intro-copy"><strong>Two little windows into Lillyhop.</strong> A calm step-counting companion for the walk you take today, and the patterns you notice over time.</p>
+    </section>
+
+    <section class="preview-grid" aria-label="Lillyhop app and desktop companion previews">
+      <article class="showcase phone-stage" aria-labelledby="phone-preview-title">
+        <div class="sun-disc" aria-hidden="true"></div>
+        <div class="shoreline" aria-hidden="true"></div>
+        <div class="lily" aria-hidden="true"></div>
+        <header class="stage-head">
+          <h2 class="stage-label" id="phone-preview-title">01 / In your pocket</h2>
+          <span class="stage-index">ANDROID APP</span>
+        </header>
+        <div class="phone">
+          <div class="phone-inner">
+            <div class="phone-status"><span>9:41</span><span aria-hidden="true">● ◔ ▰</span></div>
+            <div class="camera-pill" aria-hidden="true"></div>
+            <div class="phone-top">
+              <div><p class="phone-greeting">Monday, May 18</p><p class="phone-title">Little hops add up</p></div>
+              <span class="frog-chip" aria-hidden="true">
+                <svg viewBox="0 0 32 32" width="27" height="27" fill="none">
+                  <path d="M5 18.5c4.2-5.2 14.5-7.4 21.5-2.8-2.6 7.2-7.7 9.5-14.2 7.6-3.5-1-5.9-2.7-7.3-4.8Z" fill="#80cbaa"/>
+                  <circle cx="14" cy="12" r="4.1" fill="#e9c58e"/><circle cx="12.3" cy="11" r=".8" fill="#173d32"/><circle cx="15.7" cy="11" r=".8" fill="#173d32"/>
+                  <path d="M12.8 13c.8.6 1.6.6 2.4 0" stroke="#173d32" stroke-width=".9" stroke-linecap="round"/>
+                </svg>
+              </span>
+            </div>
+            <p class="phone-date">Illustrative sample · your Monday at a glance</p>
+
+            <div class="phone-dashboard-view" id="dashboardView">
+              <section class="goal-panel" aria-label="Daily step goal progress">
+                <p class="goal-label">TODAY’S LITTLE JOURNEY</p>
+                <div class="goal-ring" role="img" aria-label="7,284 steps, 72 percent of the 10,000 step goal">
+                  <div class="ring-content"><strong class="step-number">7,284</strong><span class="step-caption">steps so far</span></div>
+                </div>
+                <p class="goal-target"><strong>72%</strong> of your 10,000 step goal</p>
+              </section>
+              <p class="encouragement"><span class="spark" aria-hidden="true">✦</span><span>You’re getting there. A short stroll after lunch might do it.</span></p>
+              <div class="mini-stats">
+                <article class="mini-stat"><div class="mini-stat-top"><span aria-hidden="true">↗</span> Distance</div><p class="mini-stat-value">5.2 <small>km</small></p></article>
+                <article class="mini-stat"><div class="mini-stat-top"><span aria-hidden="true">◌</span> Calories</div><p class="mini-stat-value">286 <small>kcal</small></p></article>
+              </div>
+              <div class="tracking"><span>Step tracking</span><span class="tracking-state">On while you’re here</span></div>
+            </div>
+            <div class="phone-home-view" id="homebaseView">
+              <article class="homebase-card">
+                <h3>Your week in little hops</h3>
+                <p>A few steps each day make a lovely rhythm.</p>
+                <div class="week-strip" aria-label="Weekly steps goal progress">
+                  <span class="week-day hit"><span>M</span><b>✓</b></span>
+                  <span class="week-day hit"><span>T</span><b>✓</b></span>
+                  <span class="week-day hit"><span>W</span><b>✓</b></span>
+                  <span class="week-day hit"><span>T</span><b>✓</b></span>
+                  <span class="week-day hit"><span>F</span><b>✓</b></span>
+                  <span class="week-day"><span>S</span><b>·</b></span>
+                  <span class="week-day today"><span>M</span><b>7k</b></span>
+                </div>
+                <p>Five goal days this week. You’re building a nice little streak.</p>
+              </article>
+              <div class="home-summary">
+                <div class="home-line"><span>Weekly average</span><strong>8,462 steps</strong></div>
+                <div class="home-line"><span>Best day</span><strong>Thursday · 11,204</strong></div>
+                <div class="home-line"><span>Next little milestone</span><strong>40,000 steps</strong></div>
+              </div>
+            </div>
+            <nav class="phone-nav" aria-label="Phone app navigation">
+              <button class="nav-item" type="button" data-phone-view="dashboard" aria-current="page">
+                <svg viewBox="0 0 18 18" width="15" height="15" fill="none" aria-hidden="true"><path d="M3 8.1 9 3l6 5.1v6.2a.8.8 0 0 1-.8.8H3.8a.8.8 0 0 1-.8-.8V8.1Z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M7 15v-4h4v4" stroke="currentColor" stroke-width="1.3"/></svg>
+                Dashboard
+              </button>
+              <button class="nav-item" type="button" data-phone-view="homebase" aria-current="false">
+                <svg viewBox="0 0 18 18" width="15" height="15" fill="none" aria-hidden="true"><path d="M3 13.8 6.5 10l2.4 1.8L14.9 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M11.7 5h3.2v3.2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Homebase
+              </button>
+            </nav>
+          </div>
+        </div>
+      </article>
+
+      <article class="showcase desktop-stage" aria-labelledby="desktop-preview-title">
+        <header class="stage-head">
+          <h2 class="stage-label" id="desktop-preview-title">02 / Find your rhythm</h2>
+          <span class="stage-index">DESKTOP COMPANION</span>
+        </header>
+        <section class="desktop-app" aria-label="Lillyhop offline analytics companion">
+          <header class="appbar">
+            <div class="app-wordmark">
+              <span class="brand-mark" aria-hidden="true">
+                <svg viewBox="0 0 32 32" fill="none"><path d="M5 19.3c3.4-5.7 14.5-8.6 21.3-3.1-1.6 6.1-6.1 9.5-12.5 8.6-4.1-.6-7.1-2.7-8.8-5.5Z" fill="#80cbaa"/><circle cx="15" cy="12" r="3.4" fill="#e9c58e"/><circle cx="13.7" cy="11.4" r=".6" fill="#173d32"/><circle cx="16.3" cy="11.4" r=".6" fill="#173d32"/></svg>
+              </span>
+              lillyhop
+            </div>
+            <div class="appbar-right">
+              <span class="local-badge">
+                <svg viewBox="0 0 16 16" width="13" height="13" fill="none" aria-hidden="true"><path d="M8 1.8 13 3.6v3.9c0 3-2.1 5.5-5 6.7-2.9-1.2-5-3.7-5-6.7V3.6l5-1.8Z" stroke="currentColor" stroke-width="1.3"/><path d="m5.8 7.7 1.5 1.5 3-3.1" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                All data stays on this device
+              </span>
+              <span class="avatar" aria-label="Cathy">C</span>
+            </div>
+          </header>
+          <div class="app-content">
+            <div class="dashboard-heading">
+              <div>
+                <h2>Good morning, Cathy</h2>
+                <p>Illustrative sample data · see how your steps might add up.</p>
+              </div>
+              <div class="period-control" role="group" aria-label="Choose analytics period">
+                <button class="period-button" type="button" data-period="daily" aria-pressed="true">Daily</button>
+                <button class="period-button" type="button" data-period="monthly" aria-pressed="false">Monthly</button>
+                <button class="period-button" type="button" data-period="yearly" aria-pressed="false">Yearly</button>
+                <button class="period-button" type="button" data-period="compare" aria-pressed="false">Compare</button>
+              </div>
+            </div>
+            <section class="kpi-grid" aria-label="Lifetime totals">
+              <article class="kpi"><span class="kpi-label">Lifetime steps</span><strong class="kpi-value">2,486,310</strong><span class="kpi-note">since your first hop</span></article>
+              <article class="kpi"><span class="kpi-label">Distance walked</span><strong class="kpi-value" id="distanceKpi">1,773 km</strong><span class="kpi-note">a lovely long way</span></article>
+              <article class="kpi"><span class="kpi-label">Active days</span><strong class="kpi-value">298</strong><span class="kpi-note">and counting</span></article>
+              <article class="kpi"><span class="kpi-label">Goals reached</span><strong class="kpi-value">164</strong><span class="kpi-note">little wins add up</span></article>
+            </section>
+            <section class="chart-panel" aria-labelledby="chart-title">
+              <div class="chart-head">
+                <h3 id="chart-title">Your step rhythm</h3>
+                <div class="chart-legend" aria-label="Chart legend">
+                  <span class="legend-item"><i class="legend-mark"></i><span id="legendCurrent">Steps</span></span>
+                  <span class="legend-item"><i class="legend-mark goal"></i>Daily goal</span>
+                  <span class="legend-item compare-only" hidden><i class="legend-mark previous"></i>Previous period</span>
+                </div>
+              </div>
+              <div class="chart-wrap">
+                <svg class="trend-chart" viewBox="0 0 720 230" role="img" aria-label="Step count trend for the selected period">
+                  <defs><linearGradient id="areaFill" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#83c5d1" stop-opacity=".28"/><stop offset="1" stop-color="#83c5d1" stop-opacity=".015"/></linearGradient></defs>
+                  <g aria-hidden="true">
+                    <line class="chart-gridline" x1="50" y1="24" x2="704" y2="24"/><line class="chart-gridline" x1="50" y1="65" x2="704" y2="65"/>
+                    <line class="chart-gridline" x1="50" y1="106" x2="704" y2="106"/><line class="chart-gridline" x1="50" y1="147" x2="704" y2="147"/>
+                    <line class="chart-gridline" x1="50" y1="188" x2="704" y2="188"/>
+                    <text class="chart-axis-label" x="0" y="28">16k</text><text class="chart-axis-label" x="0" y="69">12k</text>
+                    <text class="chart-axis-label" x="7" y="110">8k</text><text class="chart-axis-label" x="7" y="151">4k</text>
+                    <text class="chart-axis-label" x="23" y="192">0</text>
+                    <line class="goal-line" x1="50" y1="85.5" x2="704" y2="85.5"/>
+                    <text class="chart-axis-label" x="654" y="78" fill="#a27e45">10k goal</text>
+                  </g>
+                  <path class="series-fill" id="chartFill"></path>
+                  <path class="previous-line" id="previousLine" hidden></path>
+                  <path class="series-line" id="chartLine"></path>
+                  <g id="chartDots"></g>
+                  <g id="chartLabels"></g>
+                </svg>
+              </div>
+              <p class="chart-selection" id="chartSelection"><strong>Monday, May 18:</strong> 7,284 steps · 72% of your daily goal</p>
+            </section>
+            <div class="lower-grid">
+              <section class="period-summary" aria-labelledby="summaryTitle">
+                <div class="subhead"><h3 id="summaryTitle">Today’s little summary</h3><span id="summaryDate">May 18</span></div>
+                <div class="summary-values">
+                  <div class="summary-item"><span id="summaryStepsLabel">Steps today</span><strong id="summarySteps">7,284</strong></div>
+                  <div class="summary-item"><span>Daily average</span><strong id="summaryAverage">8,462</strong></div>
+                  <div class="summary-item"><span>Distance</span><strong id="summaryDistance">5.2 km</strong></div>
+                  <div class="summary-item"><span>Goal days</span><strong id="summaryGoals">5 of 7</strong></div>
+                </div>
+              </section>
+              <section class="activity-list" aria-labelledby="activityTitle">
+                <div class="subhead"><h3 id="activityTitle">A few recent days</h3><span>Illustrative</span></div>
+                <div id="activityRows">
+                  <div class="activity-row"><span class="activity-date">Sun · May 17</span><span class="activity-steps">9,106</span></div>
+                  <div class="activity-row"><span class="activity-date">Sat · May 16</span><span class="activity-steps">6,482</span></div>
+                  <div class="activity-row"><span class="activity-date">Fri · May 15</span><span class="activity-steps">10,312</span></div>
+                </div>
+              </section>
+            </div>
+            <div class="toolbar">
+              <div class="data-actions">
+                <label class="tool-button" for="jsonImport" role="button" tabindex="0">
+                  <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 10.8V2.5m0 0L5 5.4m3-2.9 3 2.9M2.5 10v2.3c0 .7.5 1.2 1.2 1.2h8.6c.7 0 1.2-.5 1.2-1.2V10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  Import JSON
+                </label>
+                <input class="file-input" id="jsonImport" type="file" accept="application/json,.json" aria-label="Import step data JSON">
+                <button class="tool-button" id="sampleButton" type="button">
+                  <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M13.2 5.7A5.5 5.5 0 1 0 13.5 9M13.2 5.7V2.6m0 3.1h-3.1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  Use sample data
+                </button>
+                <button class="tool-button" id="unitButton" type="button" aria-label="Switch to miles">km / mi</button>
+                <button class="tool-button primary" id="exportButton" type="button">
+                  <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 2.4v8.2m0 0 3-2.9m-3 2.9-3-2.9M2.5 10.5v2.1c0 .6.5 1 1 1h9c.6 0 1-.4 1-1v-2.1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  Export
+                </button>
+                <button class="tool-button" id="printButton" type="button" aria-label="Print or save as PDF">Print</button>
+              </div>
+              <span class="data-note">
+                <svg viewBox="0 0 16 16" width="13" height="13" fill="none" aria-hidden="true"><path d="M8 1.8 13 3.6v3.9c0 3-2.1 5.5-5 6.7-2.9-1.2-5-3.7-5-6.7V3.6l5-1.8Z" stroke="currentColor" stroke-width="1.3"/><path d="m5.8 7.7 1.5 1.5 3-3.1" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+                Private by design · works offline
+              </span>
+            </div>
+          </div>
+          <div class="toast" id="toast" role="status" aria-live="polite"></div>
+        </section>
+      </article>
+    </section>
+    <footer class="page-foot">
+      <span><strong>Lillyhop</strong> · a little more outside</span>
+      <span class="foot-note"><svg viewBox="0 0 18 18" width="15" height="15" fill="none" aria-hidden="true"><path d="M9 2 14.5 4v4.3c0 3.3-2.3 6-5.5 7.4-3.2-1.4-5.5-4.1-5.5-7.4V4L9 2Z" stroke="currentColor" stroke-width="1.3"/><path d="m6.6 8.4 1.7 1.7 3.2-3.3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg> Your steps are yours. Always.</span>
+    </footer>
+  </main>
+
+  <script>
+    (() => {
+      const $ = (selector) => document.querySelector(selector);
+      const number = new Intl.NumberFormat("en-US");
+      const sampleSeries = {
+        daily: {
+          title: "Today’s little summary", date: "May 18", totalSteps: 7284, average: 8462, goals: "5 of 7",
+          labels: ["Tue", "Wed", "Thu", "Fri", "Sat", "Sun", "Mon"],
+          values: [6180, 8940, 11204, 10312, 6482, 9106, 7284],
+          selected: 6, period: "Monday, May 18", recent: [["Sun · May 17", 9106], ["Sat · May 16", 6482], ["Fri · May 15", 10312]]
+        },
+        monthly: {
+          title: "May at a glance", date: "May 1–18", totalSteps: 148248, average: 8236, goals: "12 of 18",
+          labels: ["May 1", "May 4", "May 7", "May 10", "May 13", "May 16", "May 18"],
+          values: [7120, 9360, 8044, 11204, 6840, 6482, 7284],
+          selected: 6, period: "May 18", recent: [["May 18", 7284], ["May 17", 9106], ["May 16", 6482]]
+        },
+        yearly: {
+          title: "Your year, one step at a time", date: "Jan–Dec 2026", totalSteps: 2388172, average: 8014, goals: "164 of 298",
+          labels: ["Jan", "Mar", "May", "Jul", "Sep", "Nov", "Dec"],
+          values: [6900, 8260, 9140, 7780, 10140, 8640, 7284],
+          selected: 4, period: "September 2026", recent: [["September", 9140], ["August", 8640], ["July", 7780]]
+        },
+        compare: {
+          title: "This week vs. last week", date: "May 12–18", totalSteps: 59508, average: 8501, goals: "5 of 7",
+          labels: ["Tue", "Wed", "Thu", "Fri", "Sat", "Sun", "Mon"],
+          values: [6180, 8940, 11204, 10312, 6482, 9106, 7284],
+          previous: [5470, 7900, 8720, 9360, 7080, 8240, 6850],
+          selected: 6, period: "This week", recent: []
+        }
+      };
+      sampleSeries.compare.recent = [
+        ["This week", sampleSeries.compare.values.reduce((a, b) => a + b, 0)],
+        ["Last week", sampleSeries.compare.previous.reduce((a, b) => a + b, 0)],
+        ["Difference", sampleSeries.compare.values.reduce((a, b) => a + b, 0) - sampleSeries.compare.previous.reduce((a, b) => a + b, 0)]
+      ];
+      let customData = null;
+      let activePeriod = "daily";
+      let unit = "km";
+      let toastTimer;
+
+      function showToast(message) {
+        const toast = $("#toast");
+        toast.textContent = message;
+        toast.classList.add("is-visible");
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => toast.classList.remove("is-visible"), 2800);
+      }
+
+      function distanceFor(steps) {
+        const km = steps * 0.00072;
+        return unit === "km" ? `${km.toFixed(1)} km` : `${(km * 0.621371).toFixed(1)} mi`;
+      }
+
+      function chartPoint(index, value, count) {
+        const x = 56 + (648 * index / Math.max(count - 1, 1));
+        const y = 188 - Math.min(value, 16000) / 16000 * 164;
+        return [x, y];
+      }
+
+      function linePath(values) {
+        return values.map((value, index) => {
+          const [x, y] = chartPoint(index, value, values.length);
+          return `${index === 0 ? "M" : "L"} ${x.toFixed(1)} ${y.toFixed(1)}`;
+        }).join(" ");
+      }
+
+      function renderChart(data) {
+        const path = linePath(data.values);
+        const [lastX] = chartPoint(data.values.length - 1, data.values.at(-1), data.values.length);
+        const [firstX] = chartPoint(0, data.values[0], data.values.length);
+        $("#chartLine").setAttribute("d", path);
+        $("#chartFill").setAttribute("d", `${path} L ${lastX.toFixed(1)} 188 L ${firstX.toFixed(1)} 188 Z`);
+        $("#previousLine").hidden = !data.previous;
+        if (data.previous) $("#previousLine").setAttribute("d", linePath(data.previous));
+        $(".compare-only").hidden = !data.previous;
+        $("#legendCurrent").textContent = data.previous ? "This period" : "Steps";
+        const selectedIndex = Math.min(data.selected ?? data.values.length - 1, data.values.length - 1);
+        $("#chartDots").innerHTML = data.values.map((value, index) => {
+          const [x, y] = chartPoint(index, value, data.values.length);
+          return `<circle class="chart-dot${index === selectedIndex ? " selected" : ""}" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${index === selectedIndex ? 5.5 : 3.2}"><title>${data.labels[index]}: ${number.format(value)} steps</title></circle>`;
+        }).join("");
+        const labelIndexes = new Set([0, Math.round((data.labels.length - 1) / 2), data.labels.length - 1]);
+        $("#chartLabels").innerHTML = data.labels.map((label, index) => {
+          if (!labelIndexes.has(index)) return "";
+          const [x] = chartPoint(index, 0, data.labels.length);
+          return `<text class="chart-bottom-label" x="${x.toFixed(1)}" y="218" text-anchor="${index === 0 ? "start" : index === data.labels.length - 1 ? "end" : "middle"}">${label}</text>`;
+        }).join("");
+        const selectedSteps = data.values[selectedIndex];
+        const goalPercent = Math.min(100, Math.floor(selectedSteps / 10000 * 100));
+        const selectedLabel = data.period || data.labels[selectedIndex];
+        $("#chartSelection").innerHTML = `<strong>${selectedLabel}:</strong> ${number.format(selectedSteps)} steps · ${goalPercent}% of your daily goal`;
+        $(".trend-chart").setAttribute("aria-label", `${data.previous ? "Comparison of " : ""}step counts for ${data.labels.join(", ")}. Selected ${data.labels[selectedIndex]}: ${number.format(selectedSteps)} steps.`);
+      }
+
+      function currentData() {
+        if (customData) return customData;
+        return sampleSeries[activePeriod];
+      }
+
+      function renderActivity(rows) {
+        $("#activityRows").innerHTML = rows.map(([date, steps]) =>
+          `<div class="activity-row"><span class="activity-date">${date}</span><span class="activity-steps">${number.format(steps)}</span></div>`
+        ).join("");
+      }
+
+      function renderPeriod() {
+        const data = currentData();
+        document.querySelectorAll(".period-button").forEach((button) => {
+          button.setAttribute("aria-pressed", String(button.dataset.period === activePeriod));
+        });
+        $("#summaryTitle").textContent = data.title;
+        $("#summaryDate").textContent = data.date;
+        const totalSteps = data.totalSteps ?? data.values.reduce((sum, value) => sum + value, 0);
+        $("#summaryStepsLabel").textContent = activePeriod === "daily" && !customData ? "Steps today" : "Steps in period";
+        $("#summarySteps").textContent = number.format(totalSteps);
+        $("#summaryAverage").textContent = number.format(data.average ?? Math.round(totalSteps / data.values.length));
+        $("#summaryDistance").textContent = distanceFor(totalSteps);
+        $("#summaryGoals").textContent = data.goals;
+        $("#activityTitle").textContent = activePeriod === "compare" ? "Period totals" : "A few recent days";
+        renderActivity(data.recent);
+        renderChart(data);
+      }
+
+      document.querySelectorAll(".period-button").forEach((button) => {
+        button.addEventListener("click", () => {
+          activePeriod = button.dataset.period;
+          customData = null;
+          renderPeriod();
+        });
+      });
+
+      document.querySelectorAll(".nav-item").forEach((button) => {
+        button.addEventListener("click", () => {
+          const homebase = button.dataset.phoneView === "homebase";
+          $("#dashboardView").classList.toggle("is-inactive", homebase);
+          $("#homebaseView").classList.toggle("is-active", homebase);
+          document.querySelectorAll(".nav-item").forEach((nav) => nav.setAttribute("aria-current", String(nav === button)));
+        });
+      });
+
+      $("#unitButton").addEventListener("click", () => {
+        unit = unit === "km" ? "mi" : "km";
+        $("#unitButton").textContent = unit === "km" ? "km / mi" : "mi / km";
+        $("#unitButton").setAttribute("aria-label", `Switch to ${unit === "km" ? "miles" : "kilometers"}`);
+        $("#distanceKpi").textContent = unit === "km" ? "1,773 km" : "1,102 mi";
+        renderPeriod();
+        showToast(`Distances shown in ${unit === "km" ? "kilometers" : "miles"}.`);
+      });
+
+      $("#sampleButton").addEventListener("click", () => {
+        customData = null;
+        activePeriod = "daily";
+        renderPeriod();
+        showToast("Illustrative sample data restored.");
+      });
+
+      $("#printButton").addEventListener("click", () => window.print());
+
+      $("#exportButton").addEventListener("click", () => {
+        const data = currentData();
+        const csv = ["date,steps,distance", ...data.labels.map((label, index) =>
+          `"${label}",${data.values[index]},${(data.values[index] * .00072).toFixed(2)}`
+        )].join("\r\n");
+        const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `lillyhop-${activePeriod}-steps.csv`;
+        link.click();
+        URL.revokeObjectURL(url);
+        showToast("Your step summary is ready to save.");
+      });
+
+      $("#jsonImport").addEventListener("change", async (event) => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+        try {
+          const input = JSON.parse(await file.text());
+          const rows = Array.isArray(input) ? input : input.days;
+          if (!Array.isArray(rows) || rows.length === 0) throw new Error("No days found");
+          const validRows = rows.filter((row) => row && Number.isFinite(Number(row.steps)) && Number(row.steps) >= 0);
+          if (!validRows.length) throw new Error("No valid step counts found");
+          const values = validRows.slice(-12).map((row) => Math.round(Number(row.steps)));
+          const labels = validRows.slice(-12).map((row, index) => {
+            const date = row.date ?? `Day ${index + 1}`;
+            return String(date).slice(0, 10);
+          });
+          const sum = values.reduce((total, value) => total + value, 0);
+          customData = {
+            title: "Imported step summary", date: `${labels[0]}–${labels.at(-1)}`, average: Math.round(sum / values.length),
+            goals: `${values.filter((value) => value >= 10000).length} of ${values.length}`,
+            labels, values, selected: values.length - 1, period: labels.at(-1),
+            recent: labels.slice(-3).reverse().map((label, index) => [label, values.slice(-3).reverse()[index]])
+          };
+          activePeriod = "daily";
+          renderPeriod();
+          showToast(`Imported ${values.length} days from ${file.name}.`);
+        } catch {
+          showToast("Couldn’t read that file. Try a JSON array with date and steps.");
+        } finally {
+          event.target.value = "";
+        }
+      });
+
+      $("#jsonImport").previousElementSibling?.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          $("#jsonImport").click();
+        }
+      });
+
+      renderPeriod();
+    })();
+  </script>
+</body>
+</html>

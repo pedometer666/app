@@ -11,14 +11,18 @@ import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Emerald,
-    onPrimary = Color(0xFF06351F),
-    primaryContainer = Color(0xFF0E3B2A),
-    onPrimaryContainer = Color(0xFF9FF0C5),
-    secondary = DarkAmber,
-    onSecondary = Color(0xFF3D2E00),
-    secondaryContainer = Color(0xFF3A3320),
-    onSecondaryContainer = Color(0xFFFDE68A),
+    primary = SeaGlass,
+    onPrimary = Color(0xFF12392C),
+    primaryContainer = Color(0xFF24483A),
+    onPrimaryContainer = Color(0xFFD0EDDA),
+    secondary = Ocean,
+    onSecondary = Color(0xFF12383F),
+    secondaryContainer = Color(0xFF23434A),
+    onSecondaryContainer = Color(0xFFD1EDF0),
+    tertiary = DarkSand,
+    onTertiary = Color(0xFF443116),
+    tertiaryContainer = Color(0xFF55452D),
+    onTertiaryContainer = Color(0xFFF3E1C1),
     background = DarkBackground,
     onBackground = DarkOnBackground,
     surface = DarkSurface,
@@ -37,10 +41,14 @@ private val LightColorScheme = lightColorScheme(
     onPrimary = LightOnPrimary,
     primaryContainer = LightPrimaryContainer,
     onPrimaryContainer = LightOnPrimaryContainer,
-    secondary = LightAmber,
+    secondary = LightSecondary,
     onSecondary = Color(0xFFFFFFFF),
-    secondaryContainer = Color(0xFFFFE8C2),
-    onSecondaryContainer = Color(0xFF492B00),
+    secondaryContainer = LightSecondaryContainer,
+    onSecondaryContainer = LightOnSecondaryContainer,
+    tertiary = LightTertiary,
+    onTertiary = Color(0xFFFFFFFF),
+    tertiaryContainer = LightTertiaryContainer,
+    onTertiaryContainer = LightOnTertiaryContainer,
     background = LightBackground,
     onBackground = LightOnSurface,
     surface = LightSurface,
@@ -74,4 +82,3 @@ fun PedometerTheme(
         content = content
     )
 }
-
