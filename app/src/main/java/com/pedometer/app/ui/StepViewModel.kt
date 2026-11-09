@@ -25,7 +25,7 @@ class StepViewModel(application: Application) : AndroidViewModel(application) {
     private val preferencesRepository = AppGraph.preferences()
     private val fitnessRepository = AppGraph.fitness()
 
-    val uiState: StateFlow<StepUiState> = combine(
+    private val dashboardState = combine(
         preferencesRepository.userPreferences,
         fitnessRepository.observeToday(),
         fitnessRepository.observeCurrentMonth(),
@@ -53,6 +53,13 @@ class StepViewModel(application: Application) : AndroidViewModel(application) {
             isTracking = tracking,
             currentSpeedMps = speedMps
         )
+    }
+
+    val uiState: StateFlow<StepUiState> = combine(
+        dashboardState,
+        AppGraph.premium().uiState
+    ) { state, premium ->
+        state.copy(isPremium = premium.isPremium)
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS),
@@ -77,20 +84,15 @@ class StepViewModel(application: Application) : AndroidViewModel(application) {
         preferencesRepository.setUseMetric(useMetric)
     }
 
-    /**
-     * Flips background tracking and immediately starts/stops the foreground
-     * service to match. When enabled while the permission is missing the next
-     * app launch / permission grant will start it instead.
-     */
+    /** Enables background tracking for Premium; foreground tracking remains activity-owned. */
     fun setBackgroundTrackingEnabled(enabled: Boolean) = updatePreferences {
+        if (!AppGraph.premium().uiState.value.isPremium) return@updatePreferences
         preferencesRepository.setBackgroundTrackingEnabled(enabled)
         val app = getApplication<Application>()
         if (enabled) {
             if (StepCounterService.hasActivityRecognitionPermission(app)) {
                 StepCounterService.start(app)
             }
-        } else {
-            StepCounterService.stop(app)
         }
     }
 

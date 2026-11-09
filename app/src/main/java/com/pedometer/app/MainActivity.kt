@@ -1,6 +1,7 @@
 package com.pedometer.app
 
 import android.Manifest
+import android.app.Activity
 import android.app.Application
 import android.content.Intent
 import android.net.Uri
@@ -29,6 +30,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -40,14 +42,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.core.content.FileProvider
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.pedometer.app.data.ads.AdConsentManager
+import com.pedometer.app.di.AppGraph
 import com.pedometer.app.service.StepCounterService
 import com.pedometer.app.ui.DashboardScreen
 import com.pedometer.app.ui.HomebaseScreen
 import com.pedometer.app.ui.HomebaseViewModel
 import com.pedometer.app.ui.StepViewModel
+import com.pedometer.app.ui.components.PremiumSheet
 import com.pedometer.app.ui.components.SettingsSheet
 import com.pedometer.app.ui.theme.PedometerTheme
 import com.pedometer.app.util.DateUtils
@@ -63,9 +71,10 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             PedometerTheme {
-                PedometerShell()
+                PedometerShell(this@MainActivity)
             }
         }
+        AdConsentManager.requestConsent(this)
     }
 }
 
@@ -73,9 +82,10 @@ private enum class ShellTab { DASHBOARD, HOMEBASE }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun PedometerShell() {
+private fun PedometerShell(activity: Activity) {
     val context = LocalContext.current
     val application = context.applicationContext as Application
+    val lifecycleOwner = LocalLifecycleOwner.current
 
     val stepViewModel: StepViewModel = viewModel(
         factory = ViewModelProvider.AndroidViewModelFactory.getInstance(application)
@@ -86,9 +96,11 @@ private fun PedometerShell() {
 
     val uiState by stepViewModel.uiState.collectAsStateWithLifecycle()
     val homebaseState by homebaseViewModel.uiState.collectAsStateWithLifecycle()
+    val premiumState by AppGraph.premium().uiState.collectAsStateWithLifecycle()
 
     var selectedTab by rememberSaveable { mutableStateOf(ShellTab.DASHBOARD) }
     var showSettings by rememberSaveable { mutableStateOf(false) }
+    var showPremium by rememberSaveable { mutableStateOf(false) }
     var activityRecognitionGranted by remember {
         mutableStateOf(StepCounterService.hasActivityRecognitionPermission(context))
     }
@@ -99,31 +111,62 @@ private fun PedometerShell() {
         ActivityResultContracts.RequestMultiplePermissions()
     ) {
         activityRecognitionGranted = StepCounterService.hasActivityRecognitionPermission(context)
-        if (activityRecognitionGranted && uiState.backgroundTrackingEnabled) {
+        if (activityRecognitionGranted) {
             StepCounterService.start(context)
         }
     }
 
-    // On first launch: request missing permissions, and (re)start tracking when allowed.
+    // Free tracking runs only while the app is visible. Premium can keep the service alive.
+    val keepTrackingInBackground =
+        premiumState.isPremium && uiState.backgroundTrackingEnabled
+    DisposableEffect(
+        lifecycleOwner,
+        activityRecognitionGranted,
+        keepTrackingInBackground
+    ) {
+        val observer = LifecycleEventObserver { _, event ->
+            when (event) {
+                Lifecycle.Event.ON_START -> {
+                    if (StepCounterService.hasActivityRecognitionPermission(context)) {
+                        StepCounterService.start(context)
+                    }
+                }
+                Lifecycle.Event.ON_STOP -> {
+                    if (!keepTrackingInBackground) StepCounterService.stop(context)
+                }
+                else -> Unit
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        if (lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED) &&
+            StepCounterService.hasActivityRecognitionPermission(context)
+        ) {
+            StepCounterService.start(context)
+        }
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+    }
+
+    // Request missing runtime permissions when the shell first enters composition.
     LaunchedEffect(Unit) {
         if (missingPermissions(context).isNotEmpty()) {
             permissionLauncher.launch(missingPermissions(context))
-        }
-        if (StepCounterService.hasActivityRecognitionPermission(context) && uiState.backgroundTrackingEnabled) {
-            StepCounterService.start(context)
         }
     }
 
     // Shared export/share action (top bar icon + Homebase button).
     val exportAndShare: () -> Unit = {
-        scope.launch {
-            runCatching {
-                val json = homebaseViewModel.buildExportJson()
-                withContext(Dispatchers.IO) { shareExportJson(context, json) }
-            }.onFailure { error ->
-                android.util.Log.e("PedometerShell", "Export failed", error)
-                Toast.makeText(context, R.string.export_failed, Toast.LENGTH_SHORT).show()
+        if (premiumState.isPremium) {
+            scope.launch {
+                runCatching {
+                    val json = homebaseViewModel.buildExportJson()
+                    withContext(Dispatchers.IO) { shareExportJson(context, json) }
+                }.onFailure { error ->
+                    android.util.Log.e("PedometerShell", "Export failed", error)
+                    Toast.makeText(context, R.string.export_failed, Toast.LENGTH_SHORT).show()
+                }
             }
+        } else {
+            showPremium = true
         }
     }
 
@@ -139,7 +182,9 @@ private fun PedometerShell() {
                     )
                 },
                 actions = {
-                    IconButton(onClick = exportAndShare) {
+                    IconButton(
+                        onClick = exportAndShare
+                    ) {
                         Icon(
                             imageVector = Icons.Filled.IosShare,
                             contentDescription = stringResource(R.string.export_action)
@@ -193,6 +238,8 @@ private fun PedometerShell() {
             ShellTab.HOMEBASE -> HomebaseScreen(
                 uiState = homebaseState,
                 onExportClick = exportAndShare,
+                onUpgradeClick = { showPremium = true },
+                onPrivacyOptionsClick = { AdConsentManager.showPrivacyOptions(activity) },
                 modifier = Modifier.padding(paddingValues)
             )
         }
@@ -206,7 +253,22 @@ private fun PedometerShell() {
             onBodyWeightChange = stepViewModel::setBodyWeightKg,
             onDailyGoalChange = stepViewModel::setDailyGoalSteps,
             onUseMetricChange = stepViewModel::setUseMetric,
-            onBackgroundTrackingChange = stepViewModel::setBackgroundTrackingEnabled
+            onBackgroundTrackingChange = stepViewModel::setBackgroundTrackingEnabled,
+            onUpgradeClick = {
+                showSettings = false
+                showPremium = true
+            },
+            privacyOptionsRequired = homebaseState.privacyOptionsRequired,
+            onPrivacyOptionsClick = { AdConsentManager.showPrivacyOptions(activity) }
+        )
+    }
+
+    if (showPremium) {
+        PremiumSheet(
+            uiState = premiumState,
+            onDismiss = { showPremium = false },
+            onPurchase = { AppGraph.premium().purchase(activity) },
+            onRestore = { AppGraph.premium().restorePurchases() }
         )
     }
 }

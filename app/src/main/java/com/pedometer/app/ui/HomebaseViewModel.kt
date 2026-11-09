@@ -3,6 +3,7 @@ package com.pedometer.app.ui
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.pedometer.app.data.ads.AdConsentManager
 import com.pedometer.app.di.AppGraph
 import com.pedometer.app.domain.HomebaseStats
 import com.pedometer.app.util.DateUtils
@@ -16,7 +17,11 @@ data class HomebaseUiState(
     val isLoading: Boolean = true,
     val monthLabel: String = "",
     val stats: HomebaseStats = HomebaseStats.EMPTY,
-    val useMetric: Boolean = true
+    val useMetric: Boolean = true,
+    val isPremium: Boolean = false,
+    val premiumLoading: Boolean = true,
+    val adsReady: Boolean = false,
+    val privacyOptionsRequired: Boolean = false
 )
 
 /**
@@ -30,13 +35,20 @@ class HomebaseViewModel(application: Application) : AndroidViewModel(application
 
     val uiState: StateFlow<HomebaseUiState> = combine(
         homebaseRepository.observeHomebaseStats(),
-        preferencesRepository.userPreferences
-    ) { stats, prefs ->
+        preferencesRepository.userPreferences,
+        AppGraph.premium().uiState,
+        AdConsentManager.adsReady,
+        AdConsentManager.privacyOptionsRequired
+    ) { stats, prefs, premium, adsReady, privacyOptionsRequired ->
         HomebaseUiState(
             isLoading = false,
             monthLabel = DateUtils.monthLabel(),
             stats = stats,
-            useMetric = prefs.useMetric
+            useMetric = prefs.useMetric,
+            isPremium = premium.isPremium,
+            premiumLoading = premium.isLoading,
+            adsReady = adsReady,
+            privacyOptionsRequired = privacyOptionsRequired
         )
     }.stateIn(
         scope = viewModelScope,

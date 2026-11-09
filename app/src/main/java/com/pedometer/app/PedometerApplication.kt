@@ -8,5 +8,6 @@ class PedometerApplication : Application() {
         super.onCreate()
         // Build the dependency graph once, up front; service and UI rely on it.
         AppGraph.init(this)
+        AppGraph.premium().connect()
     }
 }

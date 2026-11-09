@@ -2,13 +2,14 @@
 
 A production-grade Android pedometer built from scratch with **Kotlin**, **Jetpack Compose** and **Room** —
 plus an offline **desktop companion** for comparing your stats daily, monthly and yearly on ChromeOS,
-Windows, macOS or Linux. Everything is local: no accounts, no backend, no analytics.
+Windows, macOS or Linux. Step history stays on device; there is no pedometer account or backend.
+Google Play handles Premium purchases, and Google UMP/AdMob handles consent and ads.
 
 ```
 ┌────────────────────────────────────────────────────────────┐
 │  Android app (this repo, :app)                             │
 │  TYPE_STEP_COUNTER → foreground service → Room (per day)   │
-│  Compose dashboard · Homebase analytics hub · JSON export   │
+│  Compose dashboard · Premium Homebase · JSON export         │
 └───────────────────────────────┬────────────────────────────┘
                                  │  pedometer-export-YYYY-MM-DD.json
                                  ▼
@@ -21,8 +22,9 @@ Windows, macOS or Linux. Everything is local: no accounts, no backend, no analyt
 ## Features
 
 ### Android app
-- **Continuous background tracking** — `Sensor.TYPE_STEP_COUNTER` inside a health-typed
+- **Step tracking** — `Sensor.TYPE_STEP_COUNTER` inside a health-typed
   **foreground service** with a persistent notification (tap to open, Stop to pause).
+  Free tracking runs while the app is open; Premium can keep it running in the background.
 - **Reboot & reset resilience** — the counter zeroes on reboot and never resets at midnight,
   so daily rows are built from deltas against a persisted raw baseline, folded into Room
   inside a **single transaction** with the daily step row.
@@ -34,8 +36,15 @@ Windows, macOS or Linux. Everything is local: no accounts, no backend, no analyt
   goal streak, lifetime totals — plus a prominent **Export & Share Data** action
   (system share sheet, `FileProvider`).
 - **Settings** — stride length (cm/in), body weight (kg/lb), daily goal, km/mi units,
-  background-tracking toggle. All persisted in **Jetpack DataStore**; derived metrics are
+  Premium background-tracking toggle. All persisted in **Jetpack DataStore**; derived metrics are
   recomputed across history when stride/weight change.
+- **Free and Premium** — Google Play one-time product `premium_unlock` unlocks background
+  tracking, Homebase analytics, JSON export/desktop-companion data, and removes ads. The
+  Premium entitlement is restored from Google Play on launch; a Play promo code redeemed by
+  Cathy grants the same unlock without shipping a reusable master key.
+- **Ads and consent** — a banner is reserved for the free Homebase screen. The app requests
+  Google UMP consent before initializing the Mobile Ads SDK and exposes privacy choices when
+  required. Debug builds use Google's official test IDs.
 - Dark & light theme, edge-to-edge, adaptive launcher icon, vector notification icon.
 
 ### Desktop companion (`companion/`)
@@ -57,6 +66,8 @@ Windows, macOS or Linux. Everything is local: no accounts, no backend, no analyt
 │       │   ├── local/                     # Room: StepEntity, SensorStateEntity, StepDao,
 │       │   │                              #       MonthlyTotals, BestDay/BestDistance, LifetimeTotals
 │       │   ├── settings/                  # Jetpack DataStore user preferences
+│       │   ├── billing/                   # Google Play one-time Premium entitlement
+│       │   ├── ads/                       # UMP consent and Mobile Ads initialization
 │       │   ├── repository/                # FitnessRepository (sensor fold-in) · HomebaseRepository
 │       │   └── export/ExportJsonBuilder.kt
 │       ├── domain/                        # Pure Kotlin, unit-tested:
@@ -97,6 +108,28 @@ Windows, macOS or Linux. Everything is local: no accounts, no backend, no analyt
 > androidx dependencies. Everything else is already in the repo.
 
 Debug APK: `app/build/outputs/apk/debug/app-debug.apk`
+
+### Monetization setup
+
+1. In Play Console, create the app and add the one-time in-app product with ID
+   `premium_unlock`. Configure its price, then create a promo code for Cathy. She redeems
+   it through Google Play; no app-specific master key is needed.
+2. In AdMob, create the app and banner ad unit. Release builds require the properties
+   `admobAppId` and `admobBannerAdUnitId`, for example:
+
+   ```bash
+   ./gradlew :app:bundleRelease \
+     -PadmobAppId=ca-app-pub-XXXXXXXXXXXXXXXX~YYYYYYYYYY \
+     -PadmobBannerAdUnitId=ca-app-pub-XXXXXXXXXXXXXXXX/ZZZZZZZZZZ
+   ```
+
+3. Publish a privacy policy and add its URL in Play Console. Configure required consent
+   messages in AdMob/UMP before serving production ads. Until the production IDs are set,
+   release packaging is blocked; debug builds use Google's test ad IDs.
+
+The Play product must be active in Play Console and the app installed from a Play testing
+track for purchase testing. Price and product availability are fetched from Google Play;
+the app does not hard-code a price.
 
 ## Permissions & Play Console
 

@@ -39,11 +39,12 @@ class BootReceiver : BroadcastReceiver() {
         scope.launch {
             try {
                 AppGraph.init(context.applicationContext)
-                val enabled = AppGraph.preferences().userPreferences.first().backgroundTrackingEnabled
-                if (enabled) {
+                val settings = AppGraph.preferences().userPreferences.first()
+                val isPremium = AppGraph.premium().hasStoredEntitlement()
+                if (isPremium && settings.backgroundTrackingEnabled) {
                     StepCounterService.start(context)
                 } else {
-                    Log.i(TAG, "Background tracking disabled by user — not starting")
+                    Log.i(TAG, "Premium background tracking not enabled — not starting")
                 }
             } catch (exception: Exception) {
                 Log.w(TAG, "Failed to restart step tracking after $action", exception)

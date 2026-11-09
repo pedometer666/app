@@ -23,7 +23,7 @@ data class UserPreferences(
     /** true = kilometres / km/h, false = miles / mph. */
     val useMetric: Boolean = true,
     /** Whether the background step service should be kept running. */
-    val backgroundTrackingEnabled: Boolean = true
+    val backgroundTrackingEnabled: Boolean = false
 ) {
     companion object {
         const val DEFAULT_DAILY_GOAL_STEPS: Int = 10_000
@@ -54,7 +54,7 @@ class UserPreferencesRepository(context: Context) {
                 bodyWeightKg = prefs[BODY_WEIGHT_KG] ?: FitnessCalculator.DEFAULT_BODY_WEIGHT_KG,
                 dailyGoalSteps = prefs[DAILY_GOAL_STEPS] ?: UserPreferences.DEFAULT_DAILY_GOAL_STEPS,
                 useMetric = prefs[USE_METRIC] ?: true,
-                backgroundTrackingEnabled = prefs[BACKGROUND_TRACKING] ?: true
+                backgroundTrackingEnabled = prefs[BACKGROUND_TRACKING] ?: false
             )
         }
 

@@ -24,7 +24,8 @@ data class StepUiState(
     val strideLengthCm: Float = 75f,
     val bodyWeightKg: Float = 70f,
     val useMetric: Boolean = true,
-    val backgroundTrackingEnabled: Boolean = true,
+    val backgroundTrackingEnabled: Boolean = false,
+    val isPremium: Boolean = false,
 
     // Live tracking state (fed by the foreground service)
     val isTracking: Boolean = false,

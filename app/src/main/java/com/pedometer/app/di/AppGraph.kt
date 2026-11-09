@@ -2,6 +2,7 @@ package com.pedometer.app.di
 
 import android.content.Context
 import com.pedometer.app.data.local.AppDatabase
+import com.pedometer.app.data.billing.PremiumBillingRepository
 import com.pedometer.app.data.repository.HomebaseRepository
 import com.pedometer.app.data.repository.FitnessRepository
 import com.pedometer.app.data.settings.UserPreferencesRepository
@@ -36,15 +37,20 @@ object AppGraph {
     @Volatile
     private var homebase: HomebaseRepository? = null
 
+    @Volatile
+    private var premium: PremiumBillingRepository? = null
+
     @Synchronized
     fun init(context: Context) {
         if (database != null) return
         val db = AppDatabase.getInstance(context)
         val prefs = UserPreferencesRepository(context)
+        val billing = PremiumBillingRepository(context)
         database = db
         preferences = prefs
         fitness = FitnessRepository(db.stepDao(), prefs)
         homebase = HomebaseRepository(db.stepDao(), prefs)
+        premium = billing
     }
 
     fun preferences(): UserPreferencesRepository =
@@ -55,4 +61,7 @@ object AppGraph {
 
     fun homebase(): HomebaseRepository =
         checkNotNull(homebase) { "AppGraph.init() must run from Application.onCreate() first" }
+
+    fun premium(): PremiumBillingRepository =
+        checkNotNull(premium) { "AppGraph.init() must run from Application.onCreate() first" }
 }

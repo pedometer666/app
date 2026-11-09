@@ -54,6 +54,22 @@
     <string name="unit_imperial">Miles</string>
     <string name="background_tracking_label">Background tracking</string>
     <string name="background_tracking_body">Keep counting steps when the app is closed or after a reboot</string>
+    <string name="premium_unlock">Unlock Premium</string>
+    <string name="premium_title">Pedometer Premium</string>
+    <string name="premium_description">One payment unlocks background tracking, Homebase insights and data export, with no ads.</string>
+    <string name="premium_feature_background">• Keep counting in the background and after a reboot</string>
+    <string name="premium_feature_homebase">• Unlock Homebase trends and personal records</string>
+    <string name="premium_feature_export">• Export your data for the desktop companion</string>
+    <string name="premium_feature_no_ads">• Remove ads</string>
+    <string name="premium_loading">Connecting to Google Play…</string>
+    <string name="premium_checking">Checking your Google Play purchase…</string>
+    <string name="premium_buy">Buy lifetime access</string>
+    <string name="premium_buy_price">Buy lifetime access · %1$s</string>
+    <string name="premium_restore">Restore purchases</string>
+    <string name="premium_active">Premium is active on this Google Play account.</string>
+    <string name="premium_lifetime_notice">One-time purchase. No subscription. Google Play handles payment and refunds.</string>
+    <string name="ad_label">Advertisement</string>
+    <string name="ad_privacy_options">Privacy and ad choices</string>
     <string name="done">Done</string>
 
     <!-- Navigation tabs -->

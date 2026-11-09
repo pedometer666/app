@@ -29,6 +29,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,6 +38,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.pedometer.app.R
 import com.pedometer.app.domain.HomebaseStats
+import com.pedometer.app.ui.components.FreeHomebaseAd
 import com.pedometer.app.util.FormatUtils
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -52,6 +54,8 @@ import kotlin.math.abs
 fun HomebaseScreen(
     uiState: HomebaseUiState,
     onExportClick: () -> Unit,
+    onUpgradeClick: () -> Unit,
+    onPrivacyOptionsClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val stats = uiState.stats
@@ -75,6 +79,26 @@ fun HomebaseScreen(
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
         Spacer(Modifier.height(16.dp))
+
+        if (!uiState.isPremium) {
+            if (uiState.premiumLoading) {
+                Text(stringResource(R.string.premium_checking))
+            } else {
+                if (uiState.adsReady) FreeHomebaseAd()
+                if (uiState.privacyOptionsRequired) {
+                    TextButton(
+                        onClick = onPrivacyOptionsClick,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(stringResource(R.string.ad_privacy_options))
+                    }
+                }
+                Spacer(Modifier.height(12.dp))
+                PremiumOfferCard(onUpgradeClick)
+            }
+            Spacer(Modifier.height(28.dp))
+            return@Column
+        }
 
         ExportCard(onExportClick = onExportClick)
         Spacer(Modifier.height(12.dp))
@@ -106,6 +130,33 @@ fun HomebaseScreen(
             )
         }
         Spacer(Modifier.height(28.dp))
+    }
+}
+
+@Composable
+private fun PremiumOfferCard(onUpgradeClick: () -> Unit) {
+    ElevatedCard(
+        shape = CardDefaults.elevatedShape,
+        colors = CardDefaults.elevatedCardColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer
+        )
+    ) {
+        Column(modifier = Modifier.fillMaxWidth().padding(20.dp)) {
+            Text(
+                text = stringResource(R.string.premium_title),
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold
+            )
+            Spacer(Modifier.height(8.dp))
+            Text(
+                text = stringResource(R.string.premium_description),
+                style = MaterialTheme.typography.bodyMedium
+            )
+            Spacer(Modifier.height(14.dp))
+            Button(onClick = onUpgradeClick, modifier = Modifier.fillMaxWidth()) {
+                Text(stringResource(R.string.premium_unlock))
+            }
+        }
     }
 }
 

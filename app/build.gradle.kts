@@ -7,6 +7,11 @@ plugins {
     alias(libs.plugins.ksp)
 }
 
+val testAdMobAppId = "ca-app-pub-3940256099942544~3347511713"
+val testBannerAdUnitId = "ca-app-pub-3940256099942544/9214589741"
+val releaseAdMobAppId = providers.gradleProperty("admobAppId").orNull
+val releaseBannerAdUnitId = providers.gradleProperty("admobBannerAdUnitId").orNull
+
 android {
     namespace = "com.pedometer.app"
     compileSdk = 35
@@ -20,12 +25,20 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables { useSupportLibrary = true }
+        manifestPlaceholders["adMobAppId"] = testAdMobAppId
+        buildConfigField("String", "ADMOB_BANNER_AD_UNIT_ID", "\"$testBannerAdUnitId\"")
     }
 
     buildTypes {
         release {
             isMinifyEnabled = true
             isShrinkResources = true
+            manifestPlaceholders["adMobAppId"] = releaseAdMobAppId ?: testAdMobAppId
+            buildConfigField(
+                "String",
+                "ADMOB_BANNER_AD_UNIT_ID",
+                "\"${releaseBannerAdUnitId ?: testBannerAdUnitId}\""
+            )
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -92,8 +105,26 @@ dependencies {
     // DataStore (user preferences)
     implementation(libs.datastore.preferences)
 
+    // Monetization
+    implementation(libs.billing.client)
+    implementation(libs.play.services.ads)
+    implementation(libs.user.messaging.platform)
+
     // Coroutines
     implementation(libs.kotlinx.coroutines.android)
 
     testImplementation(libs.junit)
+}
+
+tasks.configureEach {
+    if (name.contains("Release", ignoreCase = true)) {
+        doFirst {
+            check(!releaseAdMobAppId.isNullOrBlank()) {
+                "Set -PadmobAppId to your AdMob app ID before building a release."
+            }
+            check(!releaseBannerAdUnitId.isNullOrBlank()) {
+                "Set -PadmobBannerAdUnitId to your production banner ad unit ID before building a release."
+            }
+        }
+    }
 }

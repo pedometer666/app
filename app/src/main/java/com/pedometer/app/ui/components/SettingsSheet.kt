@@ -18,6 +18,7 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -50,7 +51,10 @@ fun SettingsSheet(
     onBodyWeightChange: (Float) -> Unit,
     onDailyGoalChange: (Int) -> Unit,
     onUseMetricChange: (Boolean) -> Unit,
-    onBackgroundTrackingChange: (Boolean) -> Unit
+    onBackgroundTrackingChange: (Boolean) -> Unit,
+    onUpgradeClick: () -> Unit,
+    privacyOptionsRequired: Boolean,
+    onPrivacyOptionsClick: () -> Unit
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
@@ -192,13 +196,28 @@ fun SettingsSheet(
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
-                    Switch(
-                        checked = uiState.backgroundTrackingEnabled,
-                        onCheckedChange = onBackgroundTrackingChange
-                    )
+                    if (uiState.isPremium) {
+                        Switch(
+                            checked = uiState.backgroundTrackingEnabled,
+                            onCheckedChange = onBackgroundTrackingChange
+                        )
+                    } else {
+                        TextButton(onClick = onUpgradeClick) {
+                            Text(stringResource(R.string.premium_unlock))
+                        }
+                    }
                 }
             }
             Spacer(Modifier.height(20.dp))
+
+            if (privacyOptionsRequired) {
+                TextButton(
+                    onClick = onPrivacyOptionsClick,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(stringResource(R.string.ad_privacy_options))
+                }
+            }
 
             Button(
                 onClick = onDismiss,
