@@ -19,6 +19,7 @@ Lillyhop is a simple, friendly step-counting app being built for Cathy. It shoul
 - Cathy should receive Premium using a Google Play promo code on her account. Never add a hardcoded master key or purchase bypass.
 - Free-tier advertising is intended to be limited to a small Homebase banner, with the consent flow before ad initialization.
 - Do not add social leaderboards, rewards, subscriptions, or major scope changes unless Cathy asks.
+- Daily affirmations/encouragement should be optional, gentle, pressure-free, available offline from a small built-in set, and free (not a Premium gate). This is an agreed direction for a future feature, not a claim that it has been implemented.
 
 These are user-approved product decisions, not proof that Play Console, AdMob, legal, or release configuration is complete.
 
@@ -27,6 +28,7 @@ These are user-approved product decisions, not proof that Play Console, AdMob, l
 - Native Android app: Kotlin, Jetpack Compose, Material 3, Room, and DataStore.
 - Step counting uses Android `TYPE_STEP_COUNTER`, which is cumulative since boot. Preserve reboot/reset handling and sequential processing of sensor updates. Do not claim a numeric accuracy guarantee without documented real-device testing.
 - Dashboard includes daily goal/progress, distance and calorie estimates, tracking state, speedometer, and monthly totals. Homebase provides analytics and export subject to entitlement.
+- Optional daily affirmations are approved as a future free feature; they are not yet established as implemented.
 - Play Billing, Google UMP consent, and Mobile Ads integration are present in the last reviewed source.
 - `companion/` is an offline HTML/CSS/vanilla-JS app for locally imported data with daily/monthly/yearly/compare views, charts, and print/export. No automatic phone sync or Health Connect integration has been established.
 - `mockups/lillyhop-preview/` is a static concept mockup, not production companion code.
@@ -38,14 +40,14 @@ Step history being stored locally does not mean no data ever leaves the device. 
 
 Do not promise an accuracy margin such as 5–10% based on generic articles. Accuracy varies by device, placement, and movement. A responsible validation plan compares against manual counts across multiple devices, carry locations, and walking conditions.
 
-## Current engineering handoff (checked 2026-11-09)
+## Current engineering handoff (checked 2026-11-10)
 
 - Repo path: `D:\\Step-Counter\\pedometer-project`; branch: `arena/c07bf140-app`.
-- Last pushed commit known before this handoff: `2af8ba4` (Lillyhop branding and visual preview). Earlier notable commits: `1b13d53` (serialize step sensor readings), `e7a64df` (Premium and consent-aware ads), `efbb5d3` (Kotlin/KSP compatibility). Verify current Git history before relying on these IDs.
-- Latest Android CI checked for `2af8ba4` failed in Room/KSP processing with `java.lang.IllegalStateException: unexpected jvm signature V`; companion integration checks passed. This is a source/build-tool failure, not a Gradle download timeout.
-- The app had Kotlin/KSP 2.3.0 with Room 2.6.1. A local proposed fix now updates the Room version catalog to 2.8.5, the stable version listed on the AndroidX release page when checked. Gradle `:app:dependencies --configuration debugCompileClasspath` resolved Room 2.8.5 successfully.
-- Android unit tests/compilation have **not** been verified for that change because this computer has no Android SDK (`ANDROID_HOME`, `ANDROID_SDK_ROOT`, and the default Windows SDK location were absent). The dependency update is uncommitted and must not be called fixed until CI compiles/tests it.
-- The latest observed worktree before this handoff had an unrelated local edit in `app/src/main/java/com/pedometer/app/domain/SensorFoldLogic.kt`; Cathy explicitly asked to leave it alone. Do not alter/stage/commit/revert/push it without permission.
+- Latest pushed commit checked: `656401e` — Room 2.8.5 KSP compatibility update plus repository handoff documents. Earlier notable commits: `1b13d53` (serialize step sensor readings), `e7a64df` (Premium and consent-aware ads), `efbb5d3` (Kotlin/KSP compatibility), `2af8ba4` (Lillyhop branding and visual preview).
+- GitHub Actions for `656401e` passed: Android unit tests, Android debug APK assembly, and companion integration tests. A downloadable `app-debug` artifact was created and is scheduled to expire on 2026-11-23. See run `42722530081`.
+- GitHub pull request #1 from `arena/c07bf140-app` to `main` is still open and not merged as of this check.
+- This computer has no Android SDK (`ANDROID_HOME`, `ANDROID_SDK_ROOT`, and the default Windows SDK location were absent), so Android build/test validation was performed by GitHub Actions, not locally.
+- The latest observed worktree has an unrelated local edit in `app/src/main/java/com/pedometer/app/domain/SensorFoldLogic.kt`; Cathy explicitly asked to leave it alone. Do not alter/stage/commit/revert/push it without permission. The affirmation decision is also recorded locally in this handoff file and was not part of commit `656401e`.
 - Release readiness still requires checking Play Console product setup and promo code, real AdMob app/banner IDs, and a published/linked privacy policy. Re-check actual account/config state before claiming these are done.
 
 ## Workflow
