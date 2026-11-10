@@ -43,7 +43,7 @@ Do not promise an accuracy margin such as 5–10% based on generic articles. Acc
 ## Current engineering handoff (checked 2026-11-10)
 
 - Repo path: `D:\\Step-Counter\\pedometer-project`; branch: `arena/c07bf140-app`.
-- Latest commit merged to `main`: `8dfdb77` — records the approved free, optional, offline daily-affirmation direction. It includes the earlier `656401e` Room 2.8.5 KSP compatibility fix and repository handoff documents. Earlier notable commits: `1b13d53` (serialize step sensor readings), `e7a64df` (Premium and consent-aware ads), `efbb5d3` (Kotlin/KSP compatibility), `2af8ba4` (Lillyhop branding and visual preview).
+- Latest commit on `main`: `bbf3dde` — refreshes this handoff after PR #1 merged. The tested implementation commit `8dfdb77` records the approved free, optional, offline daily-affirmation direction and includes the earlier `656401e` Room 2.8.5 KSP compatibility fix and repository handoff documents. Earlier notable commits: `1b13d53` (serialize step sensor readings), `e7a64df` (Premium and consent-aware ads), `efbb5d3` (Kotlin/KSP compatibility), `2af8ba4` (Lillyhop branding and visual preview).
 - GitHub Actions for `8dfdb77` passed: Android unit tests, Android debug APK assembly, and companion integration tests. A downloadable `app-debug` artifact is available until 2026-11-24. See run `42830700697`.
 - GitHub pull request #1 from `arena/c07bf140-app` to `main` is merged as of 2026-11-10.
 - This computer has no Android SDK (`ANDROID_HOME`, `ANDROID_SDK_ROOT`, and the default Windows SDK location were absent), so Android build/test validation was performed by GitHub Actions, not locally.
