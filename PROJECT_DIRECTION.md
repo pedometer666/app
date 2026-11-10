@@ -43,11 +43,11 @@ Do not promise an accuracy margin such as 5–10% based on generic articles. Acc
 ## Current engineering handoff (checked 2026-11-10)
 
 - Repo path: `D:\\Step-Counter\\pedometer-project`; branch: `arena/c07bf140-app`.
-- Latest pushed commit checked: `656401e` — Room 2.8.5 KSP compatibility update plus repository handoff documents. Earlier notable commits: `1b13d53` (serialize step sensor readings), `e7a64df` (Premium and consent-aware ads), `efbb5d3` (Kotlin/KSP compatibility), `2af8ba4` (Lillyhop branding and visual preview).
-- GitHub Actions for `656401e` passed: Android unit tests, Android debug APK assembly, and companion integration tests. A downloadable `app-debug` artifact was created and is scheduled to expire on 2026-11-23. See run `42722530081`.
-- GitHub pull request #1 from `arena/c07bf140-app` to `main` is still open and not merged as of this check.
+- Latest commit merged to `main`: `8dfdb77` — records the approved free, optional, offline daily-affirmation direction. It includes the earlier `656401e` Room 2.8.5 KSP compatibility fix and repository handoff documents. Earlier notable commits: `1b13d53` (serialize step sensor readings), `e7a64df` (Premium and consent-aware ads), `efbb5d3` (Kotlin/KSP compatibility), `2af8ba4` (Lillyhop branding and visual preview).
+- GitHub Actions for `8dfdb77` passed: Android unit tests, Android debug APK assembly, and companion integration tests. A downloadable `app-debug` artifact is available until 2026-11-24. See run `42830700697`.
+- GitHub pull request #1 from `arena/c07bf140-app` to `main` is merged as of 2026-11-10.
 - This computer has no Android SDK (`ANDROID_HOME`, `ANDROID_SDK_ROOT`, and the default Windows SDK location were absent), so Android build/test validation was performed by GitHub Actions, not locally.
-- The latest observed worktree has an unrelated local edit in `app/src/main/java/com/pedometer/app/domain/SensorFoldLogic.kt`; Cathy explicitly asked to leave it alone. Do not alter/stage/commit/revert/push it without permission. The affirmation decision is also recorded locally in this handoff file and was not part of commit `656401e`.
+- The latest observed worktree has an unrelated local edit in `app/src/main/java/com/pedometer/app/domain/SensorFoldLogic.kt`; Cathy explicitly asked to leave it alone. Do not alter/stage/commit/revert/push it without permission. Its current diff is not backed up in GitHub.
 - Release readiness still requires checking Play Console product setup and promo code, real AdMob app/banner IDs, and a published/linked privacy policy. Re-check actual account/config state before claiming these are done.
 
 ## Workflow
